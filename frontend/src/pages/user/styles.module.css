@@ -1,0 +1,89 @@
+.title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.container {
+  text-align: left;
+}
+
+.titleText {
+  font-size: 54px;
+  margin: 0;
+}
+
+.user {
+  display: flex;
+  margin-bottom: 36px;
+  align-items: center;
+}
+
+.userAvatar {
+  min-width: 60px;
+  height: 60px;
+  border-radius: 60px;
+  overflow: hidden;
+  background-image: url('../../images/userpic-icon.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24px;
+}
+
+.buttonSubscribe {
+  margin-bottom: 46px;
+  display: flex;
+  align-items: center;
+}
+
+
+
+.buttonSubscribe svg {
+  margin-right: 8px;
+}
+
+.buttonSubscribe g {
+  stroke: #000;
+}
+
+.buttonSubscribe.buttonSubscribeActive g {
+  stroke: #FFF;
+}
+
+.buttonSubscribe.buttonSubscribeActive:hover g {
+  stroke: #000;
+}
+
+.buttonSubscribe:hover g {
+  stroke: #FFF;
+}
+
+@media screen and (max-width: 770px) {
+  .title {
+    display: block;
+  }
+
+  .titleText {
+    font-size: 34px;
+    margin-bottom: 0px;
+  }
+
+  .userAvatar {
+    min-width: 55px;
+    height: 55px;
+    border-radius: 55px;
+    margin-right: 20px;
+  }
+
+  .user {
+    margin-bottom: 23px;
+  }
+
+  .buttonSubscribe {
+    width: 100%;
+  }
+}

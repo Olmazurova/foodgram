@@ -1,0 +1,76 @@
+.content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  text-align: left;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 54px;
+  line-height: 110%;
+  color: #000;
+  margin: 0 0 40px;
+  margin-top: 40px;
+  text-align: left;
+}
+
+.subtitle {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 110%;
+  color: #000;
+  margin: 0 0 24px;
+}
+
+.additionalTitle {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 120%;
+  color: #000;
+  margin: 0 0 24px;
+}
+
+.text {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 130%;
+  color: #000;
+}
+
+.textItem {
+  margin: 0 0 16px;
+}
+
+.textLink {
+  color: #4a61dd;
+  text-decoration: none;
+}
+
+@media screen and (max-width: 950px) {
+  .content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding-bottom: 80px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .subtitle {
+    font-size: 26px;
+  }
+
+  .additionalTitle {
+    font-size: 22px;
+  }
+}

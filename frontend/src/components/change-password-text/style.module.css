@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.text {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 130%;
+  color: #a0a0a0;
+  text-align: left;
+  margin: 0;
+}
+
+.iconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: #a0a0a0;
+  flex-shrink: 0;
+}

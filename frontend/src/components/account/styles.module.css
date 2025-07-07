@@ -1,0 +1,125 @@
+.account {
+  position: relative;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.accountProfile {
+  display: flex;
+  align-items: center;
+}
+
+.accountAvatar {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 100%;
+  overflow: hidden;
+  margin-right: 14px;
+  background-image: url("../../images/userpic-icon.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.imageOverlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 50%;
+}
+
+.accountAvatar:hover .imageOverlay {
+  opacity: 1;
+}
+
+.accountName {
+  color: #000;
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.accountEmail {
+  color: #a0a0a0;
+  font-size: 16px;
+  line-height: 120%;
+}
+
+.accountLinks {
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.accountControls {
+  display: none;
+  padding: 36px 0 8px;
+  position: absolute;
+  top: 20px;
+  right: 0;
+  z-index: 3;
+  flex-direction: column;
+}
+
+.account:hover .accountControls {
+  display: flex;
+}
+
+.accountLinkItem {
+  margin-bottom: 8px;
+  height: 40px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  cursor: pointer;
+}
+
+.accountControls:before {
+  content: "";
+  display: block;
+  position: absolute;
+  border: 1.5px solid #efefef;
+  left: 0;
+  right: 0;
+  background: #fff;
+  bottom: 0;
+  border-radius: 8px;
+  top: 31px;
+  padding: 5px 0;
+}
+
+.accountLinkIcon {
+  width: 22px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+
+.accountLink {
+  color: #000;
+}
+
+.accountLinkTitle {
+  display: flex;
+  align-items: center;
+}

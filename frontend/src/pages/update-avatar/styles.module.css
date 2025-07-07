@@ -1,0 +1,27 @@
+.form {
+  margin: 0 auto;
+}
+
+.button {
+  margin-top: 16px;
+}
+
+.center {
+  align-self: center;
+}
+
+.fileInput {
+  flex-direction: column;
+
+  
+}
+
+.fileInput div {
+  width: 100px;
+  height: 100px;
+  margin-left: 0;
+}
+
+.fileInput button {
+  margin-bottom: 20px;
+}

@@ -1,0 +1,123 @@
+.purchase {
+  margin-bottom: 20px;
+  max-width: 600px;
+  width: 100%;
+  position: relative;
+  padding-bottom: 18px;
+  text-align: left;
+  list-style-type: none;
+  border-bottom: 1px solid #EFEFEF;
+}
+
+.purchaseBody {
+  display: flex;
+  align-items: center;
+  align-content: flex-start;
+  justify-content: space-between;
+}
+
+.purchaseDelete {
+  font-family: 'Raleway', Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 17px;
+  color: #858383;
+  text-decoration: none;
+}
+
+.recipeLink {
+  color: #000;
+  text-decoration: none;
+}
+
+.purchase:last-child {
+  margin-bottom: 0;
+}
+
+.purchaseContent {
+  display: grid;
+  position: relative;
+  grid-template-areas: 'image title'
+  'image text';
+  grid-template-columns: auto minmax(250px, 1fr);
+  justify-content: space-between;
+  column-gap: 24px;
+  width: 100%;
+}
+
+.purchaseIngredients {
+  font-size: 16px;
+  list-style: disc;
+  padding-left: 120px;
+  margin-top: 10px;
+}
+
+.purchaseImage {
+  width: 80px;
+  height: 80px;
+  grid-area: image;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: 50% 50%;
+  align-self: center;
+}
+
+.purchaseText {
+  font-family: 'Raleway', Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 17px;
+  max-width: 300px;
+  color: #000;
+  grid-area: text;
+  align-self: start;
+  margin: 0 0 28px;
+  display: flex;
+  color: #A0A0A0;
+  align-items: center;
+}
+
+.purchaseText:last-child {
+  margin-bottom: 0;
+}
+
+.purchaseText svg {
+  margin-right: 10px;
+}
+
+.purchaseTitle {
+  font-family: 'Raleway', Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  max-width: 300px;
+  font-size: 16px;
+  align-self: end;
+  line-height: 20px;
+  color: #000;
+  margin: 0 0 12px;
+  grid-area: title;
+  display: flex;
+  align-items: center;
+}
+
+.purchaseExpandButton {
+  transform-origin: center;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: transform .2s;
+  padding: 0px;
+}
+
+
+.purchaseExpandButtonExpanded {
+  transform: rotate(180deg);
+}
+
+
+@media screen and (max-width: 660px) {
+  .purchaseContent {
+    grid-template-columns: auto 1fr;
+  }
+}

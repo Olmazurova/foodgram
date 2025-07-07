@@ -1,0 +1,24 @@
+.form {
+  margin: 0 auto;
+  max-width: 604px;
+}
+
+.button {
+  margin-top: 16px;
+}
+
+.center {
+  align-self: center;
+}
+
+.texts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0 0 16px;
+}
+
+.text {
+  list-style-type: none;
+}

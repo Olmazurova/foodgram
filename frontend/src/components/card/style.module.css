@@ -1,0 +1,182 @@
+.card {
+  max-width: 363px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  min-height: 493px;
+  box-shadow: 0px 15px 45px rgba(107, 106, 131, 0.15);
+}
+
+.card__add {
+  display: flex;
+  height: 44px;
+  line-height: 44px;
+  align-items: center;
+}
+
+.card__save-button {
+  height: auto !important;
+  line-height: 1 !important;
+}
+
+.card__save-button:hover path {
+  fill: #000;
+}
+
+.card__save-button.card__save-button_active path {
+  fill: #000;
+}
+
+.card__add svg {
+  margin-right: 5px;
+}
+
+.card__add svg path {
+  stroke: #000;
+}
+
+.card__add:hover svg path {
+  stroke: #fff;
+}
+
+.card__body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 30px 24px;
+  background: #fff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+}
+
+.card__link {
+  color: #000;
+  padding-right: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card__controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.card__item {
+  margin-right: 8px;
+}
+
+.card__text {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+  color: #000;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+.card__text:last-child {
+  margin-bottom: 0;
+}
+
+.card__image {
+  height: 279px;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  min-height: 214px;
+}
+
+.card__title {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 120%;
+  color: #000;
+  margin: 0;
+  padding: 0;
+  display: block;
+  margin: 0 0 24px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s;
+}
+
+.card__time {
+  font-size: 14px;
+  padding-left: 18px;
+}
+
+.card__author {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  border-right: 2px solid #a0a0a0;
+}
+
+.card__data {
+  display: grid;
+  grid-template-columns: 48px 108px 1fr;
+  align-items: center;
+  margin-bottom: 36px;
+}
+
+.card__tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  text-transform: capitalize;
+  z-index: 2;
+}
+
+.card__time {
+}
+
+.card__time svg,
+.card__author svg {
+  margin-right: 10px;
+}
+
+.card__author-image {
+  min-width: 36px;
+  max-width: 36px;
+  height: 36px;
+  border-radius: 100%;
+  margin-right: 12px;
+  background-image: url("../../images/userpic-icon.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 1040px) {
+  .card {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 830px) {
+  .card__body {
+    padding: 24px 14px 12px;
+    min-height: 200px;
+  }
+
+  .card {
+    min-height: 400px;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .card {
+    max-width: 100%;
+  }
+}

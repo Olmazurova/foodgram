@@ -1,0 +1,33 @@
+.container {
+  position: relative;
+  position: fixed;
+  top: 30px;
+  padding: 10px 30px;
+  margin: 0 auto;
+  width: fit-content;
+  transition: all 1s;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 5px #777;
+  background-color: #fff;
+}
+
+.text {
+  margin: 0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -15px;
+  right: -27px;
+  border: none;
+  background: none;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 10px;
+}
+
+.closeBtn:hover {
+  opacity: 0.8;
+}

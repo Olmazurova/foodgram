@@ -1,0 +1,184 @@
+.subscription {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  max-width: 363px;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  box-shadow: 0px 15px 45px rgba(107, 106, 131, 0.15);
+  border-radius: 20px;
+}
+
+.subscriptionHeader {
+  padding: 30px 24px 12px;
+}
+
+.subscriptionRecipeLink {
+  color: #000;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.subscriptionBody {
+  flex: 1 0 auto;
+  padding: 12px 24px 20px;
+}
+
+.subscriptionFooter {
+  padding: 20px 24px 26px;
+}
+
+.subscriptionTitle {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 16px;
+  color: #000000;
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.subscriptionAvatar {
+  display: flex;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 36px;
+  background-image: url("../../images/userpic-icon.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  margin-right: 12px;
+}
+
+.subscriptionItems {
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.subscriptionItem {
+  position: relative;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  list-style-type: none;
+}
+
+.subscriptionItem:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background: #eeeeee;
+  height: 1px;
+  width: calc(100% - 72px);
+}
+
+.subscriptionItem:last-child {
+  margin-bottom: 0;
+}
+
+.subscriptionItem:last-child:after {
+  content: none;
+}
+
+.subscriptionLink {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  color: #4a61dd;
+}
+
+.subscriptionRecipe {
+  display: grid;
+  position: relative;
+  grid-template-areas:
+    "title image"
+    "text image";
+  justify-content: space-between;
+  column-gap: 50px;
+}
+
+.subscriptionRecipe {
+  display: grid;
+  position: relative;
+  grid-template-areas:
+    "title image"
+    "text image";
+  justify-content: space-between;
+  column-gap: 50px;
+}
+
+.subscriptionRecipeTitle {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  max-width: 200px;
+  font-size: 16px;
+  line-height: 20px;
+  color: #000;
+  align-self: end;
+  margin: 0 0 8px;
+  grid-area: title;
+}
+
+.subscriptionRecipeImage {
+  width: 72px;
+  height: 72px;
+  grid-area: image;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.subscriptionRecipeText {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 1;
+  max-width: 200px;
+  color: #a0a0a0;
+  display: flex;
+  align-items: center;
+  grid-area: text;
+  align-self: start;
+  margin: 0 0 28px;
+}
+
+.subscriptionRecipeText svg {
+  margin-right: 10px;
+}
+
+.subscriptionRecipeText:last-child {
+  margin-bottom: 0;
+}
+
+.subscriptionMore {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #4a61dd;
+}
+
+.subscriptionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+@media screen and (max-width: 860px) {
+  .subscription {
+    max-width: 100%;
+  }
+
+  .subscriptionTitle {
+    font-size: 22px;
+  }
+}

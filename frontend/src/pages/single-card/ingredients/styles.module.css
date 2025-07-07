@@ -1,0 +1,42 @@
+.ingredients {
+  margin-bottom: 60px;
+}
+
+.ingredients__list {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  padding-left: 18px;
+  gap: 0 30px;
+}
+
+.ingredients__title {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 35px;
+  color: #000;
+  margin: 0 0 24px;
+}
+
+.ingredients__list-item {
+  font-size: 18px;
+  line-height: 24px;
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  color: #000;
+  margin: 0;
+  padding: 0;
+  width: max-content;
+}
+
+@media screen and (max-width: 730px) {
+  .ingredients__title {
+    font-size: 26px;
+    line-height: 110%;
+    margin: 0 0 18px;
+  }
+}

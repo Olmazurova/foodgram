@@ -1,0 +1,24 @@
+.orders {
+  width: 52px;
+  height: 52px;
+  background-color: rgba(160, 160, 160, .2);
+  margin-right: 24px;
+  border-radius: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  justify-content: center;
+}
+
+.ordersCounter {
+  width: 24px;
+  height: 24px;
+  color: #000;
+  border-radius: 100%;
+  background-color: #FF8413;
+  position: absolute;
+  top: 0;
+  text-align: center;
+  right: 0;
+}

@@ -1,0 +1,29 @@
+.description {
+  padding-bottom: 40px;
+}
+
+.description__title {
+  font-family: 'SF Pro Display', sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 36px;
+  color: #000;
+  margin: 0 0 24px;
+}
+
+.description__content {
+  white-space: pre-line;
+}
+
+@media screen and (max-width: 730px) {
+  .description__title {
+    font-size: 26px;
+    line-height: 110%;
+    margin: 0 0 18px;
+  }
+
+  .description {
+    padding-bottom: 30px;
+  }
+}

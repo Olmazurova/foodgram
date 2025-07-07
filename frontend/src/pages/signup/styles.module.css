@@ -1,0 +1,13 @@
+.form {
+  margin: 0 auto;
+}
+
+.button {
+  margin-top: 16px;
+  padding: 4px 36px;
+  height: 52px;
+}
+
+.center {
+  align-self: center;
+}

@@ -1,0 +1,30 @@
+.main {
+  min-height: calc(100dvh - 150px - 50px - 100px);
+}
+
+.mainBG {
+  background-image: url("../../images/home-screen-bg.jpg");
+  background-position: 50% 50%;
+  background-size: cover;
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+
+.asFlex {
+  display: flex;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+@media screen and (max-width: 870px) {
+  .asFlex {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+}
+
+@media screen and (max-width: 770px) {
+  .main {
+    min-height: calc(100dvh - 290px - 100px);
+  }
+}

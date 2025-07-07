@@ -1,0 +1,22 @@
+.menuLink {
+  white-space: nowrap;
+  color: #000;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  display: inline-block;
+  font-weight: 500;
+  line-height: 110%;
+  padding: 0 18px;
+}
+
+.menuLink:last-child {
+  margin-right: 0px;
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}

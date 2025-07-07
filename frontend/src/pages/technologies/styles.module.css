@@ -1,0 +1,47 @@
+.content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  text-align: left;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 54px;
+  line-height: 110%;
+  color: #000;
+  margin: 0 0 40px;
+  margin-top: 40px;
+  text-align: left;
+}
+
+.subtitle {
+  font-family: 'Raleway', Arial, Helvetica, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 110%;
+  color: #000;
+  margin: 0 0 24px;
+}
+
+.text {
+  font-family: 'Raleway', Arial, Helvetica, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 130%;
+  color: #000;
+}
+
+.textItem {
+  margin: 0 0 16px;
+}
+
+@media screen and (max-width: 950px) {
+  .title {
+    font-size: 34px;
+  }
+}

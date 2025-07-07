@@ -1,0 +1,112 @@
+.footer {
+  background: #000000;
+  height: 150px;
+  flex: 0 0 auto;
+  margin-top: 50px;
+}
+
+.footer__brand {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #ffffff;
+}
+
+.footer__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.footer__item {
+  margin-right: 40px;
+}
+
+.footer__items {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.footer__link {
+  font-family: "SF Pro Display", sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: #fff;
+}
+
+.footer__copyright {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footer__logo {
+  max-width: 154px;
+  position: relative;
+  bottom: 12px;
+}
+
+.footer__menu {
+}
+
+.footer__menu-list {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+.footer__menu-item {
+  display: flex;
+  align-items: center;
+  margin-right: 28px;
+  height: 100%;
+  color: #fff;
+  cursor: pointer;
+  position: relative;
+}
+
+.footer__menu-link {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  color: inherit;
+  cursor: inherit;
+  font-family: "SF Pro Display", sans-serif;
+}
+
+@media screen and (max-width: 730px) {
+  .footer {
+    height: 290px;
+  }
+
+  .footer__container {
+    flex-direction: column;
+    padding: 40px 0;
+  }
+
+  .footer__menu-list {
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+  }
+
+  .footer__menu-item {
+    margin-right: 0;
+    margin-bottom: 24px;
+  }
+
+  .footer__menu-item:last-child {
+    margin-bottom: 0;
+  }
+}

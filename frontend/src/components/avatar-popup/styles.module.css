@@ -1,0 +1,122 @@
+.popup {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.popup__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  color: #000;
+  padding: 40px 60px;
+  border-radius: 20px;
+  background-color: #fff;
+  box-shadow: 0px 15px 45px rgba(107, 106, 131, 0.15);
+}
+
+.popup__close {
+  position: absolute;
+  right: -32px;
+  cursor: pointer;
+  top: 0px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup__title {
+  font-family: "SF Pro Display", sans-serif;
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 130%;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.image {
+  width: 250px;
+  height: 250px;
+  background-size: cover;
+  background-position: 50% 50%;
+  border-radius: 50%;
+  position: relative;
+}
+
+.imageOverlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 50%;
+}
+
+.image:hover .imageOverlay {
+  opacity: 1;
+}
+
+.info {
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 110%;
+  margin: 20px 0;
+  color: #a0a0a0;
+  text-align: center;
+}
+
+.error {
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 130%;
+  margin: 20px 0 0;
+  color: #ff3b30;
+  text-align: center;
+}
+
+.button_overlay {
+  padding: 4px 12px;
+  border-radius: 10px;
+  border: 1.4px solid #fff;
+  background-color: rgba(0, 0, 0, 0);
+  cursor: pointer;
+}
+
+.fileInput {
+  display: none;
+}
+
+@media screen and (max-width: 450px) {
+  .popup__content {
+    padding: 20px;
+  }
+
+  .popup__close {
+    top: 16px;
+    right: 16px;
+  }
+}
