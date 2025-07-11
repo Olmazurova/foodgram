@@ -16,7 +16,7 @@ admin.site.register(ShoppingCart)
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('name', 'author')
     search_fields = ('author', 'name')
-    list_filter = ('tag',)
+    list_filter = ('tags',)
     # общее число добавлений в избранное
 
 

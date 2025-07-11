@@ -1,5 +1,7 @@
+from datetime import timedelta
 from pathlib import Path
 
+import rest_framework.permissions
 from environs import env
 
 env.read_env()
@@ -24,6 +26,7 @@ INSTALLED_APPS = [
     'recipes.apps.RecipesConfig',
     'api.apps.ApiConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'django_filters',
     'djoser',
 ]
@@ -99,3 +102,30 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+         'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+#     'AUTH_HEADER_TYPES': ('Bearer',),
+# }
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_ID_FIELD': 'email',
+    'REQUIRE_UNIQUE_EMAIL': True,
+    # 'SERIALIZERS': {},
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
+    }
+}

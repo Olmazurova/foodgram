@@ -6,7 +6,12 @@ from .constants import MAX_LENGTH
 class User(AbstractUser):
     """Модель пользователя с дополнительным полем avatar."""
 
-    email = models.EmailField(verbose_name='Email', max_length=MAX_LENGTH)
-    password = models.CharField(verbose_name='password')
+    email = models.EmailField(
+        verbose_name='Email', max_length=MAX_LENGTH, unique=True
+    )
+    password = models.CharField(verbose_name='password', max_length=MAX_LENGTH)
     avatar = models.ImageField(verbose_name='аватар')
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
     # is_subscribed - в сериализаторе
