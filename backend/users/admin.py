@@ -1,8 +1,7 @@
 from django.contrib import admin
-
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from .models import User
 
 # В интерфейс админ-зоны нужно вывести необходимые поля моделей и настроить поиск:
 # вывести все модели с возможностью редактирования и удаления записей;
@@ -15,5 +14,8 @@ admin.site.empty_value_display = 'Не задано'
 class UserAdmin(admin.ModelAdmin):
     """Администрирование пользователей."""
 
-    list_display = ('first_name', 'last_name', 'username', 'emai', 'password', 'avatar')
+    list_display = (
+        'first_name', 'last_name', 'username', 'email', 'password', 'avatar'
+    )
     search_fields = ('email', 'first_name')
+    list_display_links = ('first_name', 'last_name', 'username', 'email')

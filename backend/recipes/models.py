@@ -4,7 +4,8 @@ from django.db import models
 
 from .constants import (
     MAX_LENGTH_TAG, MAX_LENGTH_INGREDIENT_NAME,
-    MAX_LENGTH_INGREDIENT_UNIT, MAX_LENGTH_RECIPE
+    MAX_LENGTH_INGREDIENT_UNIT, MAX_LENGTH_RECIPE,
+    MAX_DIGITS, DECIMAL_PLACES
 )
 
 User = get_user_model()
@@ -40,7 +41,11 @@ class Ingredient(models.Model):
         max_length=MAX_LENGTH_INGREDIENT_UNIT,
         verbose_name='Единица измерения'
     )
-    amount = models.DecimalField(verbose_name='количество')
+    amount = models.DecimalField(
+        verbose_name='количество',
+        max_digits=MAX_DIGITS,
+        decimal_places=DECIMAL_PLACES,
+    )
 
     class Meta:
         verbose_name = 'ингредиент'
