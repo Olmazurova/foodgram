@@ -1,7 +1,5 @@
-from datetime import timedelta
 from pathlib import Path
 
-import rest_framework.permissions
 from environs import env
 
 env.read_env()
@@ -113,18 +111,20 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
          'rest_framework.authentication.TokenAuthentication',
     ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': 5,
 }
 
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-#     'AUTH_HEADER_TYPES': ('Bearer',),
-# }
 
 DJOSER = {
     'LOGIN_FIELD': 'email',
-    'USER_ID_FIELD': 'email',
     'REQUIRE_UNIQUE_EMAIL': True,
-    # 'SERIALIZERS': {},
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.UserCreateSerializer',
+        'user': 'api.serializers.AdvancedUserSerializer',
+        'current_user': 'api.serializers.AdvancedUserSerializer',
+    },
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.IsAdminUser'],
     }
