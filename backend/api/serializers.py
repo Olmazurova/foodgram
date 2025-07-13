@@ -78,19 +78,39 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class TagSerializer(serializers.ModelSerializer):
     """Сериализатор тегов."""
 
-    pass
+    class Meta:
+        model = Tag
+        fields = '__all__'
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов."""
 
-    pass
+    amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Ingredient
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+
+    def get_amount(self, obj):
+        recipe = self.context['request']['kwargs']['id']
+        return RecipeIngredient.objects.get(
+            id_ingredient=obj, id_recipe=recipe
+        ).amount
 
 
-class RecipeIngredientSerializer(serializers.ModelSerializer):
+
+class AddIngredientSerializer(serializers.Field):
     """Сериализатор ингредиентов в рецепте с указанием их количества."""
 
-    pass
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    amount = serializers.DecimalField(
+        min_value=1, max_digits=5, decimal_places=2, normalize_output=True
+    )
+
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'amount')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -98,7 +118,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     tag = TagSerializer(many=True, read_only=True) # для записи здесь должно быть поле выбора?
     author = AdvancedUserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True, read_only=True)
+    ingredients = IngredientSerializer(many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
