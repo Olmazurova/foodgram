@@ -41,11 +41,6 @@ class Ingredient(models.Model):
         max_length=MAX_LENGTH_INGREDIENT_UNIT,
         verbose_name='Единица измерения'
     )
-    amount = models.DecimalField(
-        verbose_name='количество',
-        max_digits=MAX_DIGITS,
-        decimal_places=DECIMAL_PLACES,
-    )
 
     class Meta:
         verbose_name = 'ингредиент'
@@ -59,13 +54,20 @@ class Recipe(models.Model):
     """Модель описывающая рецепт."""
 
     tags = models.ManyToManyField(
-        Tag, related_name='recipe', verbose_name='теги'
+        Tag, related_name='recipes', verbose_name='теги'
     )
     author = models.ForeignKey(
-        User, verbose_name='автор', on_delete=models.CASCADE
+        User,
+        verbose_name='автор',
+        on_delete=models.CASCADE,
+        related_name='recipes',
     )
-    ingredients = models.ForeignKey(
-        Ingredient, verbose_name='ингредиенты', on_delete=models.CASCADE
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        verbose_name='ингредиенты',
+        related_name='recipes',
+        through='RecipeIngredient',
+        blank=True,
     )
     name = models.CharField(
         max_length=MAX_LENGTH_RECIPE, verbose_name='название'
@@ -82,8 +84,6 @@ class Recipe(models.Model):
         verbose_name='время приготовления',
         help_text='Укажите время приготовления в минутах'
     )
-    # is_favorited = bool - находится в избранном (сериализатор)
-    # is_in_shopping_cart = bool - находится в списке покупок (сериализатор)
 
     class Meta:
         verbose_name = 'рецепт'
@@ -93,19 +93,43 @@ class Recipe(models.Model):
         return self.name
 
 
+class RecipeIngredient(models.Model):
+    """Модель связывающая рецепты и ингредиенты."""
+
+    id_recipe = models.ForeignKey(
+        Recipe, verbose_name='рецепт', on_delete=models.DO_NOTHING,
+    )
+    id_ingredient = models.ForeignKey(
+        Ingredient, verbose_name='ингредиент', on_delete=models.DO_NOTHING
+    )
+    amount = models.DecimalField(
+        verbose_name='количество',
+        max_digits=MAX_DIGITS,
+        decimal_places=DECIMAL_PLACES,
+    )
+
+    class Meta:
+        verbose_name = 'ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+        unique_together = ('id_recipe', 'id_ingredient')
+
+    def __str__(self):
+        return f'{self.id_recipe} - {self.id_ingredient}'
+
+
 class ShoppingCart(models.Model):
     """Модель описывающая список покупок."""
 
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='рецепт',
-        related_name='shopping_cart',
+        related_name='shopping_carts',
         on_delete=models.DO_NOTHING
     )
     user = models.ForeignKey(
         User,
         verbose_name='пользователь',
-        related_name='shopping_cart',
+        related_name='shopping_carts',
         on_delete=models.DO_NOTHING
     )
 
@@ -149,13 +173,13 @@ class Subscription(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='пользователь',
-        related_name='subscription',
+        related_name='subscriptions',
         on_delete=models.DO_NOTHING,
     )
     following = models.ForeignKey(
         User,
         verbose_name='подписка',
-        related_name='follower',
+        related_name='followers',
         on_delete=models.DO_NOTHING,
     )
 

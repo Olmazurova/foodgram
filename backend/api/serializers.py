@@ -4,7 +4,10 @@ from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from recipes.models import Subscription, Recipe
+from recipes.models import (
+    Subscription, Recipe, Ingredient, RecipeIngredient, Favorites,
+    ShoppingCart, RecipeIngredient, Tag
+)
 
 User = get_user_model()
 
@@ -70,3 +73,124 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """Сериализатор тегов."""
+
+    pass
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов."""
+
+    pass
+
+
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов в рецепте с указанием их количества."""
+
+    pass
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор рецептов."""
+
+    tag = TagSerializer(many=True, read_only=True) # для записи здесь должно быть поле выбора?
+    author = AdvancedUserSerializer(read_only=True)
+    ingredients = RecipeIngredientSerializer(many=True, read_only=True)
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+    image = Base64ImageField()
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'is_favorited',
+            'is_in_shopping_cart',
+            'name',
+            'image',
+            'text',
+            'cooking_time'
+        )
+
+    def get_is_favorited(self, obj):  # создать отдельную функцию для этих методов
+        request = self.context.get('request')
+        user = request.user
+        return Favorites.objects.filter(user=user, recipe=obj).exists()
+
+    def get_is_shopping_cart(self, obj):
+        request = self.context.get('request')
+        user = request.user
+        return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
+
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор создания и обновления рецепта."""
+
+    ingredients = serializers.PrimaryKeyRelatedField(
+        queryset=Ingredient.objects.all(), many=True
+    )
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True
+    )
+    image = Base64ImageField(required=False)  # в patch запросе необязателен
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'ingredients',
+            'tags',
+            'image',
+            'name',
+            'text',
+            'cooking_time'
+        )
+
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+        recipe = Recipe.objects.create(**validated_data)
+        for ingredient in ingredients:
+            current_ingredient = Ingredient.objects.get(id=ingredient['id'])
+            RecipeIngredient.objects.create(
+                id_ingredient=current_ingredient,
+                id_recipe=recipe,
+                amount=ingredient['amount'],
+            )
+        return recipe
+
+    def update(self, instance, validated_data):
+        instance.tags = validated_data.get('tags', instance.tags)
+        instance.image = validated_data.get('image', instance.image)
+        instance.name = validated_data.get('name', instance.name)
+        instance.text = validated_data.get('text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time
+        )
+        if 'ingredients' not in validated_data:
+            instance.save()
+            return instance
+
+        ingredients_data = validated_data.pop('ingredients')
+        ingredients_update = []
+        for ingredient in ingredients_data:
+            current_ingredient = Ingredient.objects.get(id=ingredient['id'])  # можно ли вынести в отдельную функцию?
+            RecipeIngredient.objects.create(
+                id_ingredient=current_ingredient,
+                id_recipe=instance,
+                amount=ingredient['amount'],
+            )
+            ingredients_update.append(current_ingredient)
+        instance.ingredients.set(ingredients_update)
+        instance.save()
+        return instance
+
+    def validate_image(self, value):
+        request = self.context.get('request')
+        if request.method == 'POST' and value is None:
+            raise serializers.ValidationError('Поле image не может быть пустым!')
+        return value
