@@ -1,7 +1,9 @@
 import base64
+from pprint import pprint
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
+from django.utils import timezone
 from rest_framework import serializers
 
 from recipes.models import (
@@ -18,8 +20,11 @@ class Base64ImageField(serializers.ImageField):
         user = self.context['request'].user
         if self.context['request'].method == 'PUT':
             name = f'{user}.'
+        elif self.context['request'].method == 'POST':
+            name = f'{user}-{timezone.now()}.'
         else:
-            recipe = Recipe.objects.get(id=self.context['request']['id'])
+            pprint(self.context['request'].id)
+            recipe = Recipe.objects.get(id=self.context['request']['kwargs']['id'])
             name = f'{user}-{recipe}.'
         if isinstance(data, str) and data.startswith('data:image'):
             format, imgstr = data.split(';base64,')
@@ -86,6 +91,14 @@ class TagSerializer(serializers.ModelSerializer):
 class IngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов."""
 
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
+
+
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    """Сериализатор ингредиентов."""
+
     amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -100,13 +113,13 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 
-class AddIngredientSerializer(serializers.Field):
+class AddIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов в рецепте с указанием их количества."""
 
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.DecimalField(
-        min_value=1, max_digits=5, decimal_places=2, normalize_output=True
-    )
+    id = serializers.IntegerField()
+    # amount = serializers.DecimalField(
+    #     min_value=1, max_digits=5, decimal_places=2,
+    # )
 
     class Meta:
         model = RecipeIngredient
@@ -116,9 +129,9 @@ class AddIngredientSerializer(serializers.Field):
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор рецептов."""
 
-    tag = TagSerializer(many=True, read_only=True) # для записи здесь должно быть поле выбора?
+    tag = TagSerializer(many=True, read_only=True)
     author = AdvancedUserSerializer(read_only=True)
-    ingredients = IngredientSerializer(many=True, read_only=True)
+    ingredients = RecipeIngredientSerializer(many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
@@ -152,9 +165,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания и обновления рецепта."""
 
-    ingredients = serializers.PrimaryKeyRelatedField(
-        queryset=Ingredient.objects.all(), many=True
-    )
+    ingredients = AddIngredientSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
@@ -173,8 +184,14 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
+        tags = validated_data.pop('tags')
+        user = self.context.get('request').user
+        print(user)
+        validated_data['author'] = user
         recipe = Recipe.objects.create(**validated_data)
+        recipe.tags.set(tags)
         for ingredient in ingredients:
+            print(ingredient)
             current_ingredient = Ingredient.objects.get(id=ingredient['id'])
             RecipeIngredient.objects.create(
                 id_ingredient=current_ingredient,
