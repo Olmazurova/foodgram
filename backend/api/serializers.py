@@ -113,16 +113,16 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 
 
 
-class AddIngredientSerializer(serializers.ModelSerializer):
+class AddIngredientSerializer(serializers.Serializer):
     """Сериализатор ингредиентов в рецепте с указанием их количества."""
 
     id = serializers.IntegerField()
-    # amount = serializers.DecimalField(
-    #     min_value=1, max_digits=5, decimal_places=2,
-    # )
+    amount = serializers.DecimalField(
+        min_value=1, max_digits=5, decimal_places=2,
+    )
 
     class Meta:
-        model = RecipeIngredient
+        # model = RecipeIngredient
         fields = ('id', 'amount')
 
 
@@ -231,3 +231,27 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if request.method == 'POST' and value is None:
             raise serializers.ValidationError('Поле image не может быть пустым!')
         return value
+
+
+class FavoritesSerializer(serializers.ModelSerializer):
+    """Сериализатор для раздела 'избранное'."""
+
+    name = serializers.StringRelatedField(source='recipe__name')
+    image = serializers.ImageField(source='recipe__image')
+    cooking_time = serializers.IntegerField(source='recipe__cooking_time')
+
+    class Meta:
+        model = Favorites
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    """Сериализатор для раздела 'избранное'."""
+
+    name = serializers.StringRelatedField(source='recipe__name')
+    image = serializers.ImageField(source='recipe__image')
+    cooking_time = serializers.IntegerField(source='recipe__cooking_time')
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('id', 'name', 'image', 'cooking_time')
