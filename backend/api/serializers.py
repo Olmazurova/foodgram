@@ -212,25 +212,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
 
-class FavoritesSerializer(serializers.ModelSerializer):
-    """Сериализатор для раздела 'избранное'."""
-
-    # name = serializers.StringRelatedField(source='name')
-    # image = serializers.ImageField(source='image')
-    # cooking_time = serializers.IntegerField(source='cooking_time')
+class ShortRecipeSerializer(serializers.ModelSerializer):
+    """Сериализатор для раздела 'избранное' и корзины покупок."""
 
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
-
-
-# class ShoppingCartSerializer(serializers.ModelSerializer):
-#     """Сериализатор для раздела 'избранное'."""
-#
-#     name = serializers.StringRelatedField(source='recipe__name')
-#     image = serializers.ImageField(source='recipe__image')
-#     cooking_time = serializers.IntegerField(source='recipe__cooking_time')
-#
-#     class Meta:
-#         model = ShoppingCart
-#         fields = ('id', 'name', 'image', 'cooking_time')

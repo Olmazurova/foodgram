@@ -80,8 +80,7 @@ class Recipe(models.Model):
         verbose_name='описание',
         help_text='Заполните описание приготовления блюда'
     )
-    cooking_time = models.SmallIntegerField(
-        validators=[MinValueValidator(1),],
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='время приготовления',
         help_text='Укажите время приготовления в минутах'
     )
@@ -110,16 +109,15 @@ class RecipeIngredient(models.Model):
     """Модель связывающая рецепты и ингредиенты."""
 
     recipe = models.ForeignKey(
-        Recipe, verbose_name='рецепт', on_delete=models.DO_NOTHING,
+        Recipe, verbose_name='рецепт', on_delete=models.CASCADE,
     )
     ingredient = models.ForeignKey(
-        Ingredient, verbose_name='ингредиент', on_delete=models.DO_NOTHING,
+        Ingredient, verbose_name='ингредиент', on_delete=models.CASCADE,
     )
     amount = models.DecimalField(
         verbose_name='количество',
         max_digits=MAX_DIGITS,
         decimal_places=DECIMAL_PLACES,
-        # default=0,
     )
 
     class Meta:
