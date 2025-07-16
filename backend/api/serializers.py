@@ -99,21 +99,30 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов."""
 
-    amount = serializers.SerializerMethodField()
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    name = serializers.CharField(source='id.name', read_only=True)
+    measurement_unit = serializers.CharField(source='id.measurement_unit', read_only=True)
+    # amount = serializers.DecimalField(source='recipes__amount', min_value=1, max_digits=5, decimal_places=2,)
+
 
     class Meta:
-        model = Ingredient
+        model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount')
-
-    def get_amount(self, obj):
-        print('контекст')
-        pprint(self.context)
-        print("реквест")
-        pprint(self.context['recipe'])
-        recipe = self.context['recipe']
-        return RecipeIngredient.objects.get(
-            id_ingredient=obj, id_recipe=recipe
-        ).amount
+    # amount = serializers.SerializerMethodField()
+    #
+    # class Meta:
+    #     model = Ingredient
+    #     fields = ('id', 'name', 'measurement_unit', 'amount')
+    #
+    # def get_amount(self, obj):
+    #     print('контекст')
+    #     pprint(self.context)
+    #     print("реквест")
+    #     pprint(self.context['recipe'])
+    #     recipe = self.context['recipe']
+    #     return RecipeIngredient.objects.get(
+    #         id_ingredient=obj, id_recipe=recipe
+    #     ).amount
 
 
 
@@ -135,7 +144,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     tags = TagSerializer(many=True, read_only=True)
     author = AdvancedUserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True, read_only=True)
+    ingredients = RecipeIngredientSerializer(source='recipeingredients_set', many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
     in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
