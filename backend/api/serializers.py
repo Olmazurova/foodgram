@@ -101,7 +101,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(), source='ingredient')
     name = serializers.CharField(source='ingredient.name', read_only=True)
     measurement_unit = serializers.CharField(source='ingredient.measurement_unit', read_only=True)
-    # amount = serializers.DecimalField(min_value=1, max_digits=5, decimal_places=2,)
+    amount = serializers.DecimalField(min_value=1, max_digits=5, decimal_places=2,)
 
 
     class Meta:
@@ -186,6 +186,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags')
         ingredients_data = validated_data.pop('ingredients')
+        print(ingredients_data)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -193,11 +194,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         instance.tags.set(tags)
 
-        RecipeIngredient.objects.filter(recipe=instance).delete()
+        # RecipeIngredient.objects.filter(recipe=instance).delete()
         for ingredient in ingredients_data:
-            current_ingredient = ingredient['ingredient']
+            current_ingredient = Ingredient.objects.get(id=ingredient['ingredient'])
             amount = ingredient['amount']
-            RecipeIngredient.objects.create(
+            RecipeIngredient.objects.update_or_create(
                 ingredient=current_ingredient,
                 recipe=instance,
                 amount=amount
@@ -211,16 +212,16 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
 
-# class FavoritesSerializer(serializers.ModelSerializer):
-#     """Сериализатор для раздела 'избранное'."""
-#
-#     name = serializers.StringRelatedField(source='recipe__name')
-#     image = serializers.ImageField(source='recipe__image')
-#     cooking_time = serializers.IntegerField(source='recipe__cooking_time')
-#
-#     class Meta:
-#         model = Favorites
-#         fields = ('id', 'name', 'image', 'cooking_time')
+class FavoritesSerializer(serializers.ModelSerializer):
+    """Сериализатор для раздела 'избранное'."""
+
+    # name = serializers.StringRelatedField(source='name')
+    # image = serializers.ImageField(source='image')
+    # cooking_time = serializers.IntegerField(source='cooking_time')
+
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
 
 
 # class ShoppingCartSerializer(serializers.ModelSerializer):

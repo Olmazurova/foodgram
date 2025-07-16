@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from recipes.models import Recipe, Tag, Ingredient
 from .serializers import (
     AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
-    TagSerializer, IngredientSerializer)
+    TagSerializer, IngredientSerializer, FavoritesSerializer)
 
 User = get_user_model()
 
@@ -64,31 +64,38 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return Response(read_serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
-        print("PATCH request received")
-        return super().partial_update(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        recipe = serializer.save()
+        read_serializer = RecipeSerializer(recipe, context={'request': request})
+        return Response(read_serializer.data)
 
-    # @action(
-    #     detail=True,
-    #     methods=['post', 'delete'],
-    #     permission_classes=[IsAuthenticated],
-    #     # url_path='id/favorite',
-    # )
-    # def favorite(self, request, id=None):
-    #     """Добавляет и удаляет рецепт из избранного."""
-    #     user = request.user
-    #     recipe = Recipe.objects.get(id=id)
-    #
-    #     if request.method == 'POST':
-    #         result = Favorites.objects.create(user=user, recipe=recipe)
-    #         serializer = FavoritesSerializer(result)
-    #         return Response(serializer.data)
-    #
-    #     result = get_object_or_404(Favorites, user=user, recipe=recipe)
-    #     result.delete()
-    #     return Response(
-    #         {'detail': 'Рецепт успешно удалён из избранного'},
-    #         status=status.HTTP_204_NO_CONTENT
-    #     )
+    @action(
+        detail=True,
+        methods=['post', 'delete'],
+        permission_classes=[IsAuthenticated],
+        # url_path='id/favorite',
+    )
+    def favorite(self, request, id=None):
+        """Добавляет и удаляет рецепт из избранного."""
+        user = request.user
+        recipe = Recipe.objects.get(id=id)
+
+        if request.method == 'POST':
+            recipe.favorited.set(user)
+            # result = Favorites.objects.create(user=user, recipe=recipe)
+            serializer = FavoritesSerializer(recipe)
+            return Response(serializer.data)
+
+        # user.favorited_recipes.delete(recipe)
+        recipe.favorited.delete(user)
+
+        # result = get_object_or_404(Favorites, user=user, recipe=recipe)
+        # result.delete()
+        return Response(
+            {'detail': 'Рецепт успешно удалён из избранного'},
+            status=status.HTTP_204_NO_CONTENT
+        )
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
