@@ -85,6 +85,18 @@ class Recipe(models.Model):
         verbose_name='время приготовления',
         help_text='Укажите время приготовления в минутах'
     )
+    favorited = models.ManyToManyField(
+        User,
+        related_name='favorited_recipes',
+        blank=True,
+        verbose_name='рецепты в избранном'
+    )
+    in_shopping_cart = models.ManyToManyField(
+        User,
+        related_name='shopping_cart',
+        blank=True,
+        verbose_name='рецепты в списке покупок'
+    )
 
     class Meta:
         verbose_name = 'рецепт'
@@ -97,76 +109,26 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     """Модель связывающая рецепты и ингредиенты."""
 
-    id_recipe = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe, verbose_name='рецепт', on_delete=models.DO_NOTHING,
     )
-    id_ingredient = models.ForeignKey(
+    ingredient = models.ForeignKey(
         Ingredient, verbose_name='ингредиент', on_delete=models.DO_NOTHING,
     )
     amount = models.DecimalField(
         verbose_name='количество',
         max_digits=MAX_DIGITS,
         decimal_places=DECIMAL_PLACES,
-        default=0,
+        # default=0,
     )
 
     class Meta:
         verbose_name = 'ингредиент в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
-        unique_together = ('id_recipe', 'id_ingredient')
+        unique_together = ('recipe', 'ingredient')
 
     def __str__(self):
-        return f'{self.id_recipe} - {self.id_ingredient}'
-
-
-class ShoppingCart(models.Model):
-    """Модель описывающая список покупок."""
-
-    recipe = models.ForeignKey(
-        Recipe,
-        verbose_name='рецепт',
-        related_name='shopping_carts',
-        on_delete=models.DO_NOTHING
-    )
-    user = models.ForeignKey(
-        User,
-        verbose_name='пользователь',
-        related_name='shopping_carts',
-        on_delete=models.DO_NOTHING
-    )
-
-    class Meta:
-        verbose_name = 'список покупок'
-        verbose_name_plural = 'Списки покупок'
-        unique_together = ('recipe', 'user')
-
-    def __str__(self):
-        return f'{self.user} - {self.recipe}'
-
-
-class Favorites(models.Model):
-    """Модель описывающая раздел "Избранное" пользователя."""
-
-    recipe = models.ForeignKey(
-        Recipe,
-        verbose_name='рецепт',
-        related_name='favorites',
-        on_delete=models.DO_NOTHING,
-    )
-    user = models.ForeignKey(
-        User,
-        verbose_name='пользователь',
-        related_name='favorites',
-        on_delete=models.DO_NOTHING,
-    )
-
-    class Meta:
-        verbose_name = 'избранное'
-        verbose_name_plural = 'Избранное'
-        unique_together = ('recipe', 'user')
-
-    def __str__(self):
-        return f'{self.user} - {self.recipe}'
+        return f'{self.recipe} - {self.ingredient}'
 
 
 class Subscription(models.Model):

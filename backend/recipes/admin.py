@@ -1,15 +1,13 @@
 from django.contrib import admin
 
 from .models import (
-    Recipe, Tag, Ingredient, Favorites, Subscription, ShoppingCart
+    Recipe, Tag, Ingredient, Subscription
 )
 
 admin.site.empty_value_display = 'Не задано'
 
 admin.site.register(Tag)
-admin.site.register(Favorites)
 admin.site.register(Subscription)
-admin.site.register(ShoppingCart)
 
 
 @admin.register(Recipe)
