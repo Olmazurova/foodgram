@@ -44,9 +44,9 @@ class AvatarView(APIView):
 class SubscriptionView(APIView):
     """Представление подписки на пользователя."""
 
-    def post(self, request, pk=None):
+    def post(self, request, id=None):
         user = request.user
-        follower = User.objects.get(id=pk)
+        follower = User.objects.get(id=id)
         user.followers.add(follower)
         serializer = SubscriptionUserSerializer(
             follower,
@@ -55,15 +55,10 @@ class SubscriptionView(APIView):
         )
         return Response(serializer.data)
 
-    def delete(self, request, pk=None):
+    def delete(self, request, id=None):
         user = request.user
-        follower = User.objects.get(id=pk)
+        follower = User.objects.get(id=id)
         user.followers.remove(follower)
-        serializer = SubscriptionUserSerializer(
-            follower,
-            data=request.data,
-            context={'request': request},
-        )
         return Response(
             {'detail': 'Успешная отписка'},
             status=status.HTTP_204_NO_CONTENT

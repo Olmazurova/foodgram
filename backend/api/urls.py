@@ -14,7 +14,7 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('users/me/avatar/', AvatarView.as_view(), name='avatar'),
     path(
-        r'users/(?P<id>\d+)/avatar/',
+        r'users/(^?P<id>\d+$)/subscribe/',
         SubscriptionView.as_view(),
         name='subscription'
     ),
