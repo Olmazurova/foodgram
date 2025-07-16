@@ -101,12 +101,13 @@ class RecipeIngredient(models.Model):
         Recipe, verbose_name='рецепт', on_delete=models.DO_NOTHING,
     )
     id_ingredient = models.ForeignKey(
-        Ingredient, verbose_name='ингредиент', on_delete=models.DO_NOTHING
+        Ingredient, verbose_name='ингредиент', on_delete=models.DO_NOTHING,
     )
     amount = models.DecimalField(
         verbose_name='количество',
         max_digits=MAX_DIGITS,
         decimal_places=DECIMAL_PLACES,
+        default=0,
     )
 
     class Meta:

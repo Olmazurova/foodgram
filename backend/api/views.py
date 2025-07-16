@@ -1,3 +1,5 @@
+from pprint import pprint
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, generics
@@ -48,12 +50,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     # serializer_class = RecipeSerializer
     # Доступна фильтрация по избранному, автору, списку покупок и тегам.
-    # permissions - на чтение всем, создание - юзер, изменение-удаление - автор\админ
+    # permissions - на чтение всем, создание - юзер, изменение-удаление - автор\адми
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return RecipeSerializer
         return RecipeCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        recipe = serializer.save()
+        # pprint(request)
+        read_serializer = RecipeSerializer(recipe, context={'request': request, 'recipe': recipe})
+        return Response(read_serializer.data)
 
     @action(
         detail=True,
@@ -78,7 +88,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             status=status.HTTP_204_NO_CONTENT
         )
 
-    @action(permission_classes=[IsAuthenticated])
+    @action(detail=False, permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         """Выгружает список покупок пользователю."""
         pass

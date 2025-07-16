@@ -106,34 +106,38 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'measurement_unit', 'amount')
 
     def get_amount(self, obj):
-        recipe = self.context['request']['kwargs']['id']
+        print('контекст')
+        pprint(self.context)
+        print("реквест")
+        pprint(self.context['recipe'])
+        recipe = self.context['recipe']
         return RecipeIngredient.objects.get(
             id_ingredient=obj, id_recipe=recipe
         ).amount
 
 
 
-class AddIngredientSerializer(serializers.Serializer):
+class AddIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов в рецепте с указанием их количества."""
 
-    id = serializers.IntegerField()
-    amount = serializers.DecimalField(
-        min_value=1, max_digits=5, decimal_places=2,
-    )
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    # amount = serializers.DecimalField(
+    #     min_value=1, max_digits=5, decimal_places=2,
+    # )
 
     class Meta:
-        # model = RecipeIngredient
+        model = RecipeIngredient
         fields = ('id', 'amount')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор рецептов."""
 
-    tag = TagSerializer(many=True, read_only=True)
+    tags = TagSerializer(many=True, read_only=True)
     author = AdvancedUserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(many=True, read_only=True)
     is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    in_shopping_cart = serializers.SerializerMethodField()
     image = Base64ImageField()
 
     class Meta:
@@ -144,7 +148,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'author',
             'ingredients',
             'is_favorited',
-            'is_in_shopping_cart',
+            'in_shopping_cart',
             'name',
             'image',
             'text',
@@ -156,7 +160,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         user = request.user
         return Favorites.objects.filter(user=user, recipe=obj).exists()
 
-    def get_is_shopping_cart(self, obj):
+    def get_in_shopping_cart(self, obj):
         request = self.context.get('request')
         user = request.user
         return ShoppingCart.objects.filter(user=user, recipe=obj).exists()
@@ -183,21 +187,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
+        ingredients_data = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         user = self.context.get('request').user
-        print(user)
         validated_data['author'] = user
         recipe = Recipe.objects.create(**validated_data)
         recipe.tags.set(tags)
-        for ingredient in ingredients:
+        ingredients_list = [component['id'] for component in ingredients_data]
+        recipe.ingredients.set(ingredients_list)
+        for ingredient in ingredients_data:
             print(ingredient)
-            current_ingredient = Ingredient.objects.get(id=ingredient['id'])
-            RecipeIngredient.objects.create(
-                id_ingredient=current_ingredient,
-                id_recipe=recipe,
-                amount=ingredient['amount'],
-            )
+            current_ingredient = ingredient['id']
+            amount = ingredient['amount']
+            RecipeIngredient.objects.filter(
+                id_ingredient=current_ingredient, id_recipe=recipe
+            ).update(amount=amount)
         return recipe
 
     def update(self, instance, validated_data):
@@ -213,16 +217,26 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             return instance
 
         ingredients_data = validated_data.pop('ingredients')
-        ingredients_update = []
+        ingredients_list = [component['id'] for component in ingredients_data]
+        instance.ingredients.set(ingredients_list)
         for ingredient in ingredients_data:
-            current_ingredient = Ingredient.objects.get(id=ingredient['id'])  # можно ли вынести в отдельную функцию?
-            RecipeIngredient.objects.create(
-                id_ingredient=current_ingredient,
-                id_recipe=instance,
-                amount=ingredient['amount'],
-            )
-            ingredients_update.append(current_ingredient)
-        instance.ingredients.set(ingredients_update)
+            current_ingredient = ingredient['id']
+            amount = ingredient['amount']
+            RecipeIngredient.objects.filter(
+                id_ingredient=current_ingredient, id_recipe=instance
+            ).update(amount=amount)
+
+
+        # ingredients_update = []
+        # for ingredient in ingredients_data:
+        #     current_ingredient = Ingredient.objects.get(id=ingredient['id'])  # можно ли вынести в отдельную функцию?
+        #     RecipeIngredient.objects.create(
+        #         id_ingredient=current_ingredient,
+        #         id_recipe=instance,
+        #         amount=ingredient['amount'],
+        #     )
+        #     ingredients_update.append(current_ingredient)
+        # instance.ingredients.set(ingredients_update)
         instance.save()
         return instance
 
