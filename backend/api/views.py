@@ -6,13 +6,12 @@ from rest_framework import status, viewsets, generics
 from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
 from recipes.models import Recipe, Tag, Ingredient
 from .serializers import (
     AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
-    TagSerializer, IngredientSerializer, ShortRecipeSerializer)
+    TagSerializer, IngredientSerializer, ShortRecipeSerializer, SubscriptionUserSerializer)
 
 User = get_user_model()
 
@@ -37,7 +36,36 @@ class AvatarView(APIView):
         user.avatar = None
         user.save(update_fields=['avatar'])
         return Response(
-            {'message': 'Аватар успешно удалён'},
+            {'detail': 'Аватар успешно удалён'},
+            status=status.HTTP_204_NO_CONTENT
+        )
+
+
+class SubscriptionView(APIView):
+    """Представление подписки на пользователя."""
+
+    def post(self, request, pk=None):
+        user = request.user
+        follower = User.objects.get(id=pk)
+        user.followers.add(follower)
+        serializer = SubscriptionUserSerializer(
+            follower,
+            data=request.data,
+            context={'request': request},
+        )
+        return Response(serializer.data)
+
+    def delete(self, request, pk=None):
+        user = request.user
+        follower = User.objects.get(id=pk)
+        user.followers.remove(follower)
+        serializer = SubscriptionUserSerializer(
+            follower,
+            data=request.data,
+            context={'request': request},
+        )
+        return Response(
+            {'detail': 'Успешная отписка'},
             status=status.HTTP_204_NO_CONTENT
         )
 
@@ -133,6 +161,3 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     # permissions
-
-
-

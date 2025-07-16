@@ -48,8 +48,7 @@ class AdvancedUserSerializer(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
-        user = request.user
+        user = self.context.get('request').user
         return Subscription.objects.filter(user=user, following=obj).exists()
 
 
@@ -194,7 +193,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         instance.tags.set(tags)
 
-        # RecipeIngredient.objects.filter(recipe=instance).delete()
         for ingredient in ingredients_data:
             current_ingredient = Ingredient.objects.get(id=ingredient['ingredient'])
             amount = ingredient['amount']
@@ -218,3 +216,14 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class SubscriptionUserSerializer(AdvancedUserSerializer):
+    """Сериализатор подписки."""
+
+    recipes = ShortRecipeSerializer(read_only=True)
+    recipes_count = serializers.SerializerMethodField(read_only=True)
+
+    def get_recipes_count(self, obj):
+        # user = User.objects.get(id=self.context['request']['kwargs']['pk'])
+        return Recipe.objects.filter(author=obj).count()
