@@ -1,19 +1,23 @@
-from pprint import pprint
+import os
 
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from rest_framework import status, viewsets, generics
-from rest_framework.decorators import permission_classes, action
+from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import Recipe, Tag, Ingredient, Subscription
-from .constants import SHORT_LINK_PREFIX, URL_RECIPE_PREFIX
+from recipes.models import Recipe, Tag, Ingredient, Subscription, RecipeIngredient
+from .constants import SHORT_LINK_PREFIX
 from .serializers import (
     AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
-    TagSerializer, IngredientSerializer, ShortRecipeSerializer, SubscriptionUserSerializer)
+    TagSerializer, IngredientSerializer, ShortRecipeSerializer,
+    SubscriptionUserSerializer
+)
 
 User = get_user_model()
 
@@ -137,7 +141,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=False, permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         """Выгружает список покупок пользователю."""
-        pass
+        user = request.user
+        users_recipes_in_cart = Recipe.objects.filter(
+            in_shopping_cart=user
+        ).values_list('id', flat=True)
+        users_ingredients = RecipeIngredient.objects.filter(
+            recipe__in=users_recipes_in_cart
+        ).order_by('ingredient')
+        ingredients_summary = users_ingredients.values(
+            'ingredient__name', 'ingredient__measurement_unit'
+        ).annotate(total_amount=Sum('amount'))
+        file_name = f'shopping_cart_{user.username}.txt'
+        content = ['Ваш список покупок:',]
+
+        for ingredient in ingredients_summary:
+            name = ingredient['ingredient__name']
+            measurement_init = ingredient['ingredient__measurement_unit']
+            amount = ingredient['total_amount']
+            content.append(f'{name} - {amount} {measurement_init}')
+
+        file_content = '\n'.join(content)
+
+        response = HttpResponse(
+            file_content, content_type='text/plain; charset=utf-8'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        return response
+
 
     @action(
         detail=True,
