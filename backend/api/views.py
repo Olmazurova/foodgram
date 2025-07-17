@@ -1,7 +1,8 @@
 from pprint import pprint
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from rest_framework import status, viewsets, generics
 from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from recipes.models import Recipe, Tag, Ingredient, Subscription
+from .constants import SHORT_LINK_PREFIX, URL_RECIPE_PREFIX
 from .serializers import (
     AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
     TagSerializer, IngredientSerializer, ShortRecipeSerializer, SubscriptionUserSerializer)
@@ -48,7 +50,7 @@ class SubscribeView(generics.CreateAPIView, generics.DestroyAPIView):
     serializer_class = SubscriptionUserSerializer
 
     def get_queryset(self):
-        return get_object_or_404(User, id=self.kwargs.get('id'))
+        return get_object_or_404(User, id=self.kwargs.get('pk'))
 
     def create(self, request, *args, **kwargs):
         user = request.user
@@ -86,6 +88,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     http_method_names = ['get', 'post', 'patch', 'delete']
     queryset = Recipe.objects.all()
+    lookup_field = 'pk'
     # serializer_class = RecipeSerializer
     # Доступна фильтрация по избранному, автору, списку покупок и тегам.
     # permissions - на чтение всем, создание - юзер, изменение-удаление - автор\адми
@@ -117,7 +120,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, pk=None):
         """Добавляет и удаляет рецепт из избранного."""
         user = request.user
-        recipe = Recipe.objects.get(id=pk)
+        recipe = Recipe.objects.get(pk=id)
 
         if request.method == 'POST':
             recipe.favorited.add(user)
@@ -156,6 +159,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
             {'detail': 'Рецепт успешно удалён из списка покупок'},
             status=status.HTTP_204_NO_CONTENT
         )
+
+    @action(
+        detail=True,
+        methods=['get'],
+        permission_classes=[IsAuthenticated],
+        url_path='get-link',
+    )
+    def get_link(self, request, pk=None):
+        """Возвращает короткую ссылку на рецепт."""
+        recipe = Recipe.objects.get(id=pk)
+        short_url = f'{SHORT_LINK_PREFIX}{hex(recipe.id)}/'
+        return Response(
+            {'short-link': short_url}, status=status.HTTP_200_OK
+        )
+
+
+class DecodeLinkView(APIView):
+    """С короткой ссылки перенаправляет на рецепт."""
+
+    def get(self, request, hex_id=None):
+        recipe_id = int(hex_id, base=16)
+        recipe_url = reverse('recipe-detail', kwargs={'pk': recipe_id})
+        return redirect(recipe_url)
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
