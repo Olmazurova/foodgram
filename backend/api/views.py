@@ -8,7 +8,7 @@ from rest_framework.permissions import SAFE_METHODS, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from recipes.models import Recipe, Tag, Ingredient
+from recipes.models import Recipe, Tag, Ingredient, Subscription
 from .serializers import (
     AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
     TagSerializer, IngredientSerializer, ShortRecipeSerializer, SubscriptionUserSerializer)
@@ -41,28 +41,44 @@ class AvatarView(APIView):
         )
 
 
-class SubscriptionView(APIView):
+class SubscribeView(generics.CreateAPIView, generics.DestroyAPIView):
     """Представление подписки на пользователя."""
 
-    def post(self, request, id=None):
+    permission_classes = [IsAuthenticated,]
+    serializer_class = SubscriptionUserSerializer
+
+    def get_queryset(self):
+        return get_object_or_404(User, id=self.kwargs.get('id'))
+
+    def create(self, request, *args, **kwargs):
         user = request.user
-        follower = User.objects.get(id=id)
-        user.followers.add(follower)
-        serializer = SubscriptionUserSerializer(
+        follower = self.get_queryset()
+        Subscription.objects.create(user=user, following=follower)
+        serializer = self.get_serializer(
             follower,
-            data=request.data,
             context={'request': request},
         )
         return Response(serializer.data)
 
-    def delete(self, request, id=None):
+    def delete(self, request, *args, **kwargs):
         user = request.user
-        follower = User.objects.get(id=id)
-        user.followers.remove(follower)
+        follower = self.get_queryset()
+        Subscription.objects.filter(user=user, following=follower).delete()
         return Response(
             {'detail': 'Успешная отписка'},
             status=status.HTTP_204_NO_CONTENT
         )
+
+
+class SubscriptionsView(generics.ListAPIView):
+    """Показывает список подписок."""
+
+    serializer_class = SubscriptionUserSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return User.objects.filter(followers__user=user)
+
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
