@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from .constants import (
@@ -81,7 +82,8 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='время приготовления',
-        help_text='Укажите время приготовления в минутах'
+        help_text='Укажите время приготовления в минутах',
+        validators=[MinValueValidator(1)]
     )
     favorited = models.ManyToManyField(
         User,
@@ -89,7 +91,7 @@ class Recipe(models.Model):
         blank=True,
         verbose_name='рецепты в избранном'
     )
-    in_shopping_cart = models.ManyToManyField(
+    is_in_shopping_cart = models.ManyToManyField(
         User,
         related_name='shopping_cart',
         blank=True,

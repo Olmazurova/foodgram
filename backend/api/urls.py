@@ -17,7 +17,7 @@ urlpatterns = [
     path('users/me/avatar/', AvatarView.as_view(), name='avatar'),
     path('users/subscriptions/', SubscriptionsView.as_view(), name='subscriptions'),
     re_path(
-        'users/(?P<id>\d+)/subscribe/',
+        r'users/(?P<id>\d+)/subscribe/',
         SubscribeView.as_view(),
         name='subscribe'
     ),

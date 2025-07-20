@@ -1,17 +1,22 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from .constants import MAX_LENGTH
+from .constants import MAX_LENGTH_EMAIL, MAX_LENGTH_CHARFIELD
 
 
 class User(AbstractUser):
     """Модель пользователя с дополнительным полем avatar."""
 
     email = models.EmailField(
-        verbose_name='Email', max_length=MAX_LENGTH, unique=True
+        verbose_name='Email', max_length=MAX_LENGTH_EMAIL, unique=True
     )
-    # password = models.CharField(verbose_name='пароль', max_length=MAX_LENGTH)
+    first_name = models.CharField(
+        _('first name'), max_length=MAX_LENGTH_CHARFIELD
+    )
+    last_name = models.CharField(
+        _('last name'), max_length=MAX_LENGTH_CHARFIELD
+    )
     avatar = models.ImageField(
         verbose_name='аватар',
         upload_to='media/users/',
