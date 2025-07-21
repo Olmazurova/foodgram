@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
 from rest_framework import status, viewsets, generics, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
@@ -14,6 +15,7 @@ from rest_framework.exceptions import ValidationError
 
 from recipes.models import Recipe, Tag, Ingredient, Subscription, RecipeIngredient
 from .constants import SHORT_LINK_PREFIX, DOMAIN
+from .filters import RecipeFilter
 from .serializers import (
     AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
     TagSerializer, IngredientSerializer, ShortRecipeSerializer,
@@ -24,6 +26,14 @@ from .permissions import IsAuthorOrAdminOrReadOnly, IsAuthenticatedOrIsAdmin
 User = get_user_model()
 
 
+class CustomUserViewSet(UserViewSet):
+
+    def me(self, request, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+        return super().me(request, *args, **kwargs)
+
+
 class AvatarView(APIView):
     """Представление для добавления и удаления аватара пользователя."""
 
@@ -31,13 +41,11 @@ class AvatarView(APIView):
 
     def put(self, request):
         user = request.user
-        print(request.data)
         serializer = AvatarSerializer(
             data=request.data,
             context={'request': request}
         )
         serializer.is_valid(raise_exception=True)
-        print(serializer.validated_data)
         user.avatar = serializer.validated_data['avatar']
         user.save()
         return Response({'avatar': f'{DOMAIN}{user.avatar.url}'})  # ???
@@ -101,13 +109,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Предстваление отображения рецепта."""
 
     http_method_names = ['get', 'post', 'patch', 'delete']
-    queryset = Recipe.objects.all()
+    queryset = Recipe.objects.all().order_by('name')
     lookup_field = 'pk'
-    # permission_classes = [IsAuthenticatedOrIsAdmin, IsAuthorOrAdminOrReadOnly,]
-    filter_backends = (DjangoFilterBackend,)
-    filterset_fields = (
-        'author', 'tags__slug', 'favorited', 'is_in_shopping_cart'
-    )
+    # filter_backends = (DjangoFilterBackend,)
+    # filterset_class = RecipeFilter
+    # filterset_fields = ('author', 'tags__slug', 'is_favorited', 'is_in_shopping_cart')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        author_param = self.request.query_params.get('author', None)
+        tags_param = self.request.query_params.getlist('tags', None)
+        is_favorited_param = self.request.query_params.get('is_favorited', None)
+        in_shopping_cart_param = self.request.query_params.get(
+            'is_in_shopping_cart', None
+        )
+        if tags_param:
+            queryset = queryset.filter(tags__slug__in=tags_param)
+
+        if author_param:
+            queryset = queryset.filter(author__id=author_param)
+
+        if is_favorited_param == '1' and user.is_authenticated:
+            queryset = queryset.filter(is_favorited=user)
+
+        if in_shopping_cart_param == '1' and user.is_authenticated:
+            queryset = queryset.filter(is_in_shopping_cart=user)
+        return queryset.distinct()
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -120,9 +148,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif self.action == 'create':
             return [IsAuthenticated()]
         return [IsAuthorOrAdminOrReadOnly()]
-
-    def get_object(self):
-        return get_object_or_404(Recipe, id=self.kwargs.get('pk'))
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -152,27 +177,46 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer = ShortRecipeSerializer(recipe, context={'request': request})
 
         if request.method == 'POST':
-            recipes_in_favorited = Recipe.objects.filter(favorited=user)
+            recipes_in_favorited = Recipe.objects.filter(is_favorited=user)
             if recipe in recipes_in_favorited:
                 raise ValidationError(
                     'Ошибка добавления в избранное'
                 )
-            recipe.favorited.add(user)
+            recipe.is_favorited.add(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         if request.method == 'DELETE':
-            recipes_in_favorited = Recipe.objects.filter(favorited=user)
+            recipes_in_favorited = Recipe.objects.filter(is_favorited=user)
             if recipe not in recipes_in_favorited:
                 raise ValidationError(
                     'Ошибка удаления из избранного'
                 )
-            recipe.favorited.remove(user)
+            recipe.is_favorited.remove(user)
 
 
         return Response(
             {'detail': 'Рецепт успешно удалён из избранного'},
             status=status.HTTP_204_NO_CONTENT
         )
+
+    # @action(
+    #     detail=False,
+    #     methods=['get'],
+    #     # permission_classes=[IsAuthenticated],
+    # )
+    # def favorites(self, request, pk=None):
+    #     """Показывает список рецептов в избранном."""
+    #     user = request.user
+    #     recipe = Recipe.objects.filter(is_favorited=user)
+    #     serializer = ShortRecipeSerializer(
+    #         recipe, context={'request': request}, many=True
+    #     )
+    #     print(recipe)
+    #
+    #     if recipe is None:
+    #         return Response({'detail': 'Рецептов в избранном нет.'})
+    #
+    #     return Response(serializer.data)
 
     @action(
         detail=False,

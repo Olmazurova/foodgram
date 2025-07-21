@@ -10,6 +10,7 @@ from rest_framework import serializers
 from recipes.models import (
     Subscription, Recipe, Ingredient, RecipeIngredient, Tag
 )
+from .constants import PAGE_SIZE
 
 User = get_user_model()
 
@@ -23,7 +24,6 @@ class Base64ImageField(serializers.ImageField):
         elif self.context['request'].method == 'POST':
             name = f'{user}-{timezone.now()}.'
         else:
-            # pprint(])
             id = self.context['request'].path.split('/')[-2]
             recipe = Recipe.objects.get(id=int(id))
             name = f'{user}-{recipe}.'
@@ -168,7 +168,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):  # создать отдельную функцию для этих методов
         user = self.context.get('request').user
-        return user.is_authenticated and obj.favorited.filter(id=user.id).exists()
+        return user.is_authenticated and obj.is_favorited.filter(id=user.id).exists()
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
@@ -238,7 +238,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate_ingredients(self, value):
-        print('Ingr', value)
         if not value:
             raise serializers.ValidationError("Обязательное поле.")
         ingredient_ids = [ingredient['ingredient'].id for ingredient in value]
@@ -257,7 +256,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        print(attrs)
         request = self.context.get('request')
         if request and request.method == 'PATCH':
             missing_fields = []
@@ -310,20 +308,15 @@ class SubscriptionUserSerializer(AdvancedUserSerializer):
         return Recipe.objects.filter(author=obj).count()
 
     def get_recipes(self, obj):
+        request = self.context.get('request')
         recipes_queryset = Recipe.objects.filter(author=obj)
+        recipes_limit = request.query_params.get('recipes_limit')
+        try:
+            limit = int(recipes_limit)
+        except (TypeError, ValueError):
+            limit = PAGE_SIZE
+
+        recipes_queryset = recipes_queryset[:limit]
         return ShortRecipeSerializer(
             recipes_queryset, many=True, context=self.context
         ).data
-
-    # def validate(self, attrs):
-    #     print(attrs)
-    #     user = self.context.get('request').user
-    #     follower = self.instance
-    #     if (user == follower or Subscription.objects.filter(
-    #             user=user, following=follower
-    #     ).exists()):
-    #         print(Subscription.objects.filter(
-    #             user=user, following=follower
-    #     ).exists())
-    #         raise serializers.ValidationError('Ошибка подписки.')
-

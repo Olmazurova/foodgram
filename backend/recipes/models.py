@@ -74,7 +74,7 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name='изображение',
         help_text='Загрузите изображение блюда',
-        upload_to='media/recipes/',
+        upload_to='recipes/',
     )
     text = models.TextField(
         verbose_name='описание',
@@ -85,7 +85,7 @@ class Recipe(models.Model):
         help_text='Укажите время приготовления в минутах',
         validators=[MinValueValidator(1)]
     )
-    favorited = models.ManyToManyField(
+    is_favorited = models.ManyToManyField(
         User,
         related_name='favorited_recipes',
         blank=True,
@@ -101,6 +101,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'рецепт'
         verbose_name_plural = 'Рецепты'
+        ordering = ('name', 'author')
 
     def __str__(self):
         return self.name
@@ -137,13 +138,13 @@ class Subscription(models.Model):
         User,
         verbose_name='пользователь',
         related_name='subscriptions',
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
     )
     following = models.ForeignKey(
         User,
         verbose_name='подписка',
         related_name='followers',
-        on_delete=models.DO_NOTHING,
+        on_delete=models.CASCADE,
     )
 
     class Meta:
