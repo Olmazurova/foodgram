@@ -5,7 +5,6 @@ from django.db import models
 from .constants import (
     MAX_LENGTH_TAG, MAX_LENGTH_INGREDIENT_NAME,
     MAX_LENGTH_INGREDIENT_UNIT, MAX_LENGTH_RECIPE,
-    MAX_DIGITS, DECIMAL_PLACES
 )
 
 User = get_user_model()
@@ -116,11 +115,7 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(
         Ingredient, verbose_name='ингредиент', on_delete=models.CASCADE,
     )
-    amount = models.DecimalField(
-        verbose_name='количество',
-        max_digits=MAX_DIGITS,
-        decimal_places=DECIMAL_PLACES,
-    )
+    amount = models.PositiveSmallIntegerField(verbose_name='количество')
 
     class Meta:
         verbose_name = 'ингредиент в рецепте'

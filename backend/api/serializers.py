@@ -1,6 +1,4 @@
 import base64
-from decimal import Decimal
-from pprint import pprint
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
@@ -60,10 +58,11 @@ class AdvancedUserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return (user.is_authenticated
-                and Subscription.objects.filter(
-                    user=user, following=obj
-                ).exists())
+        if user.is_authenticated:
+            return Subscription.objects.filter(
+                user=user, following=obj
+            ).exists()
+        return False
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -72,12 +71,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'password',
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'password',
         )
         extra_kwargs = {
             'id': {'read_only': True},
@@ -108,15 +103,6 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class DecimalNoTrailingZerosField(serializers.DecimalField):
-    def to_representation(self, value):
-        value = super().to_representation(value)
-        dec_value = Decimal(value)
-        if dec_value == dec_value.to_integral():
-            return int(dec_value)
-        return dec_value
-
-
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     """Сериализатор ингредиентов."""
 
@@ -129,9 +115,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
     measurement_unit = serializers.CharField(
         source='ingredient.measurement_unit', read_only=True
     )
-    amount = DecimalNoTrailingZerosField(
-        min_value=1, max_digits=5, decimal_places=2,
-    )
+    amount = serializers.IntegerField(min_value=1)
 
     class Meta:
         model = RecipeIngredient
@@ -154,31 +138,28 @@ class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'id',
-            'tags',
-            'author',
-            'ingredients',
-            'is_favorited',
-            'is_in_shopping_cart',
-            'name',
-            'image',
-            'text',
-            'cooking_time'
+            'id', 'tags', 'author', 'ingredients',
+            'is_favorited', 'is_in_shopping_cart',
+            'name', 'image', 'text', 'cooking_time',
         )
 
     def get_is_favorited(self, obj):  # создать отдельную функцию для этих методов
         user = self.context.get('request').user
-        return user.is_authenticated and obj.is_favorited.filter(id=user.id).exists()
+        return (user.is_authenticated
+                and obj.is_favorited.filter(id=user.id).exists())
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
-        return user.is_authenticated and obj.is_in_shopping_cart.filter(id=user.id).exists()
+        return (user.is_authenticated
+                and obj.is_in_shopping_cart.filter(id=user.id).exists())
 
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания и обновления рецепта."""
 
-    ingredients = RecipeIngredientSerializer(many=True, source='recipeingredient_set')
+    ingredients = RecipeIngredientSerializer(
+        many=True, source='recipeingredient_set'
+    )
     tags = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(), many=True
     )
@@ -187,12 +168,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = (
-            'ingredients',
-            'tags',
-            'image',
-            'name',
-            'text',
-            'cooking_time'
+            'ingredients', 'tags', 'image',
+            'name', 'text', 'cooking_time',
         )
 
     def create(self, validated_data):
@@ -222,7 +199,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.tags.set(tags)
         RecipeIngredient.objects.filter(recipe=instance).delete()
         for ingredient in ingredients_data:
-            current_ingredient = Ingredient.objects.get(id=ingredient['ingredient'].id)
+            current_ingredient = Ingredient.objects.get(
+                id=ingredient['ingredient'].id
+            )
             amount = ingredient['amount']
             RecipeIngredient.objects.create(
                 ingredient=current_ingredient,
@@ -301,8 +280,10 @@ class SubscriptionUserSerializer(AdvancedUserSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name',
-            'last_name', 'is_subscribed', 'recipes', 'recipes_count', 'avatar')
+        fields = (
+            'email', 'id', 'username', 'first_name', 'last_name',
+            'is_subscribed', 'recipes', 'recipes_count', 'avatar'
+        )
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()

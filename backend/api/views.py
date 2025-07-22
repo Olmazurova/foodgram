@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.views import UserViewSet
 from rest_framework import status, viewsets, generics, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
@@ -21,17 +20,9 @@ from .serializers import (
     TagSerializer, IngredientSerializer, ShortRecipeSerializer,
     SubscriptionUserSerializer, AvatarSerializer
 )
-from .permissions import IsAuthorOrAdminOrReadOnly, IsAuthenticatedOrIsAdmin
+from .permissions import IsAuthorOrAdminOrReadOnly
 
 User = get_user_model()
-
-
-class CustomUserViewSet(UserViewSet):
-
-    def me(self, request, *args, **kwargs):
-        if self.request.user.is_anonymous:
-            return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
-        return super().me(request, *args, **kwargs)
 
 
 class AvatarView(APIView):
@@ -104,7 +95,6 @@ class SubscriptionsView(generics.ListAPIView):
         return User.objects.filter(followers__user=user)
 
 
-
 class RecipeViewSet(viewsets.ModelViewSet):
     """Предстваление отображения рецепта."""
 
@@ -113,7 +103,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     lookup_field = 'pk'
     # filter_backends = (DjangoFilterBackend,)
     # filterset_class = RecipeFilter
-    # filterset_fields = ('author', 'tags__slug', 'is_favorited', 'is_in_shopping_cart')
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -168,7 +157,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        # permission_classes=[IsAuthenticated],
     )
     def favorite(self, request, pk=None):
         """Добавляет и удаляет рецепт из избранного."""
@@ -198,25 +186,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             {'detail': 'Рецепт успешно удалён из избранного'},
             status=status.HTTP_204_NO_CONTENT
         )
-
-    # @action(
-    #     detail=False,
-    #     methods=['get'],
-    #     # permission_classes=[IsAuthenticated],
-    # )
-    # def favorites(self, request, pk=None):
-    #     """Показывает список рецептов в избранном."""
-    #     user = request.user
-    #     recipe = Recipe.objects.filter(is_favorited=user)
-    #     serializer = ShortRecipeSerializer(
-    #         recipe, context={'request': request}, many=True
-    #     )
-    #     print(recipe)
-    #
-    #     if recipe is None:
-    #         return Response({'detail': 'Рецептов в избранном нет.'})
-    #
-    #     return Response(serializer.data)
 
     @action(
         detail=False,
@@ -255,7 +224,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=['post', 'delete'],
-        # permission_classes=[IsAuthenticated],
     )
     def shopping_cart(self, request, pk=None):  # весь метод в функцию?
         """Добавляет и удаляет рецепты из списка покупок."""
@@ -329,4 +297,4 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filterset_fields = ('name',)
-    # search_fields = ('^name',)
+    search_fields = ('^name',)
