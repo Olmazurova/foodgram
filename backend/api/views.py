@@ -99,32 +99,32 @@ class RecipeViewSet(viewsets.ModelViewSet):
     """Предстваление отображения рецепта."""
 
     http_method_names = ['get', 'post', 'patch', 'delete']
-    queryset = Recipe.objects.all().order_by('name')
+    queryset = Recipe.objects.all()
     lookup_field = 'pk'
-    # filter_backends = (DjangoFilterBackend,)
-    # filterset_class = RecipeFilter
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user = self.request.user
-        author_param = self.request.query_params.get('author', None)
-        tags_param = self.request.query_params.getlist('tags', None)
-        is_favorited_param = self.request.query_params.get('is_favorited', None)
-        in_shopping_cart_param = self.request.query_params.get(
-            'is_in_shopping_cart', None
-        )
-        if tags_param:
-            queryset = queryset.filter(tags__slug__in=tags_param)
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     user = self.request.user
+    #     author_param = self.request.query_params.get('author', None)
+    #     tags_param = self.request.query_params.getlist('tags', None)
+    #     is_favorited_param = self.request.query_params.get('is_favorited', None)
+    #     in_shopping_cart_param = self.request.query_params.get(
+    #         'is_in_shopping_cart', None
+    #     )
+    #     if tags_param:
+    #         queryset = queryset.filter(tags__slug__in=tags_param)
 
-        if author_param:
-            queryset = queryset.filter(author__id=author_param)
+    #     if author_param:
+    #         queryset = queryset.filter(author__id=author_param)
 
-        if is_favorited_param == '1' and user.is_authenticated:
-            queryset = queryset.filter(is_favorited=user)
+    #     if is_favorited_param == '1' and user.is_authenticated:
+    #         queryset = queryset.filter(is_favorited=user)
 
-        if in_shopping_cart_param == '1' and user.is_authenticated:
-            queryset = queryset.filter(is_in_shopping_cart=user)
-        return queryset.distinct()
+    #     if in_shopping_cart_param == '1' and user.is_authenticated:
+    #         queryset = queryset.filter(is_in_shopping_cart=user)
+    #     return queryset.distinct()
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

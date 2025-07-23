@@ -1,8 +1,8 @@
 import django_filters
 from django_filters import filters
-from django_filters.rest_framework import FilterSet, AllValuesMultipleFilter
+from django_filters.rest_framework import FilterSet, AllValuesMultipleFilter, ModelMultipleChoiceFilter, BooleanFilter
 
-from recipes.models import Recipe
+from recipes.models import Recipe, Tag
 
 
 class RecipeFilter(FilterSet):
@@ -12,11 +12,11 @@ class RecipeFilter(FilterSet):
         print("RecipeFilter constructed")
         super().__init__(*a, **kw)
 
-    tags = AllValuesMultipleFilter(field_name='tags__slug')
-    is_in_shopping_cart = filters.BooleanFilter(
+    tags = ModelMultipleChoiceFilter(queryset=Tag.objects.all(), field_name='tags__slug', to_field_name='slug')
+    is_in_shopping_cart = BooleanFilter(
         method='filter_in_shopping_cart'
     )
-    is_favorited = filters.BooleanFilter(method='filter_is_favorited')
+    is_favorited = BooleanFilter(method='filter_is_favorited')
 
     class Meta:
         model = Recipe
@@ -37,5 +37,5 @@ class RecipeFilter(FilterSet):
         if not user.is_authenticated:
             return queryset.none()
         if value:
-            return queryset.filter(is_favorited__user_id=user.id)
+            return queryset.filter(is_favorited=user)
         return queryset.exclude(is_favorited=user)
