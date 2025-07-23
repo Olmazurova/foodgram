@@ -1,6 +1,6 @@
 import django_filters
 from django_filters import filters
-from django_filters.rest_framework import FilterSet, AllValuesMultipleFilter
+from django_filters.rest_framework import FilterSet, AllValuesMultipleFilter, MultipleChoiceFilter
 
 from recipes.models import Recipe
 
@@ -13,6 +13,7 @@ class RecipeFilter(FilterSet):
         super().__init__(*a, **kw)
 
     tags = AllValuesMultipleFilter(field_name='tags__slug')
+    # tags = MultipleChoiceFilter(choices='tags__slug')
     is_in_shopping_cart = filters.BooleanFilter(
         method='filter_in_shopping_cart'
     )
