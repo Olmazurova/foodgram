@@ -1,0 +1,151 @@
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
+from django.db import models
+
+from .constants import (
+    MAX_LENGTH_TAG, MAX_LENGTH_INGREDIENT_NAME,
+    MAX_LENGTH_INGREDIENT_UNIT, MAX_LENGTH_RECIPE,
+)
+
+User = get_user_model()
+
+
+class Tag(models.Model):
+    """Модель описывающая теги."""
+
+    name = models.CharField(
+        max_length=MAX_LENGTH_TAG, unique=True, verbose_name='Название'
+    )
+    slug = models.SlugField(
+        max_length=MAX_LENGTH_TAG, unique=True, verbose_name='Идентификатор'
+    )
+
+    class Meta:
+        verbose_name = 'тег'
+        verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return self.name
+
+
+class Ingredient(models.Model):
+    """Модель описывающая ингредиенты рецептов."""
+
+    name = models.CharField(
+        max_length=MAX_LENGTH_INGREDIENT_NAME,
+        unique=True,
+        verbose_name='Название ингредиента',
+    )
+    measurement_unit = models.CharField(
+        max_length=MAX_LENGTH_INGREDIENT_UNIT,
+        verbose_name='Единица измерения'
+    )
+
+    class Meta:
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return self.name
+
+
+class Recipe(models.Model):
+    """Модель описывающая рецепт."""
+
+    tags = models.ManyToManyField(
+        Tag, related_name='recipes', verbose_name='теги'
+    )
+    author = models.ForeignKey(
+        User,
+        verbose_name='автор',
+        on_delete=models.CASCADE,
+        related_name='recipes',
+    )
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        verbose_name='ингредиенты',
+        related_name='recipes',
+        through='RecipeIngredient',
+    )
+    name = models.CharField(
+        max_length=MAX_LENGTH_RECIPE, verbose_name='название'
+    )
+    image = models.ImageField(
+        verbose_name='изображение',
+        help_text='Загрузите изображение блюда',
+        upload_to='recipes/',
+    )
+    text = models.TextField(
+        verbose_name='описание',
+        help_text='Заполните описание приготовления блюда'
+    )
+    cooking_time = models.PositiveSmallIntegerField(
+        verbose_name='время приготовления',
+        help_text='Укажите время приготовления в минутах',
+        validators=[MinValueValidator(1)]
+    )
+    is_favorited = models.ManyToManyField(
+        User,
+        related_name='favorited_recipes',
+        blank=True,
+        verbose_name='рецепты в избранном'
+    )
+    is_in_shopping_cart = models.ManyToManyField(
+        User,
+        related_name='shopping_cart',
+        blank=True,
+        verbose_name='рецепты в списке покупок'
+    )
+
+    class Meta:
+        verbose_name = 'рецепт'
+        verbose_name_plural = 'Рецепты'
+        ordering = ('name', 'author')
+
+    def __str__(self):
+        return self.name
+
+
+class RecipeIngredient(models.Model):
+    """Модель связывающая рецепты и ингредиенты."""
+
+    recipe = models.ForeignKey(
+        Recipe, verbose_name='рецепт', on_delete=models.CASCADE,
+    )
+    ingredient = models.ForeignKey(
+        Ingredient, verbose_name='ингредиент', on_delete=models.CASCADE,
+    )
+    amount = models.PositiveSmallIntegerField(verbose_name='количество')
+
+    class Meta:
+        verbose_name = 'ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+        unique_together = ('recipe', 'ingredient')
+
+    def __str__(self):
+        return f'{self.recipe} - {self.ingredient}'
+
+
+class Subscription(models.Model):
+    """Модель описывающая подписку пользователя на авторов."""
+
+    user = models.ForeignKey(
+        User,
+        verbose_name='пользователь',
+        related_name='subscriptions',
+        on_delete=models.CASCADE,
+    )
+    following = models.ForeignKey(
+        User,
+        verbose_name='подписка',
+        related_name='followers',
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        verbose_name = 'подписка'
+        verbose_name_plural = 'Подписки'
+        unique_together = ('user', 'following')
+
+    def __str__(self):
+        return f'{self.user} - {self.following}'
