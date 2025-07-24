@@ -258,14 +258,16 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
     def validate(self, attrs):
+        print(attrs)
         user = self.context.get('request').user
         recipes_in_cart = Recipe.objects.filter(is_in_shopping_cart=user)
-        recipes_in_favorited = Recipe.objects.filter(favorited=user)
-        if self.instance in recipes_in_cart:
+        recipes_in_favorited = Recipe.objects.filter(is_favorited=user)
+        recipe = Recipe.objects.get(id=self.instance.id)
+        if recipe in recipes_in_cart:
             raise serializers.ValidationError(
                 'Ошибка добавления в список покупок'
             )
-        if self.instance in recipes_in_favorited:
+        if recipe in recipes_in_favorited:
             raise serializers.ValidationError(
                 'Ошибка добавления в избранное'
             )
