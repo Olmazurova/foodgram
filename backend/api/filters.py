@@ -8,7 +8,11 @@ from recipes.models import Recipe, Tag
 class RecipeFilter(FilterSet):
     """Настройка фильтрации рецептов."""
 
-    tags = ModelMultipleChoiceFilter(queryset=Tag.objects.all(), field_name='tags__slug', to_field_name='slug')
+    tags = ModelMultipleChoiceFilter(
+        queryset=Tag.objects.all(),
+        field_name='tags__slug',
+        to_field_name='slug'
+    )
     is_in_shopping_cart = BooleanFilter(
         method='filter_in_shopping_cart'
     )
