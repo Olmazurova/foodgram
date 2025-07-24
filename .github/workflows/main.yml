@@ -126,9 +126,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs:
-      - build_and_push_to_docker_hub
-      - build_frontend_and_push_to_docker_hub
-      - build_gateway_and_push_to_docker_hub
+      - backend_build_and_push_to_docker_hub
+      - frontend_build_and_push_to_docker_hub
+      - gateway_build_and_push_to_docker_hub
     environment: production
     steps:
       - name: Checkout repo
