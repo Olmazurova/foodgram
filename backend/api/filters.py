@@ -1,16 +1,12 @@
-import django_filters
-from django_filters import filters
-from django_filters.rest_framework import FilterSet, AllValuesMultipleFilter, ModelMultipleChoiceFilter, BooleanFilter
+from django_filters.rest_framework import (
+    FilterSet, ModelMultipleChoiceFilter, BooleanFilter
+)
 
 from recipes.models import Recipe, Tag
 
 
 class RecipeFilter(FilterSet):
     """Настройка фильтрации рецептов."""
-
-    def __init__(self, *a, **kw):
-        print("RecipeFilter constructed")
-        super().__init__(*a, **kw)
 
     tags = ModelMultipleChoiceFilter(queryset=Tag.objects.all(), field_name='tags__slug', to_field_name='slug')
     is_in_shopping_cart = BooleanFilter(
@@ -31,8 +27,6 @@ class RecipeFilter(FilterSet):
         return queryset
     
     def filter_is_favorited(self, queryset, name, value):
-        print('filter_is_favorited called')
-        print(value)
         user = self.request.user
         if not user.is_authenticated:
             return queryset.none()

@@ -11,12 +11,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
-
 from recipes.models import Recipe, Tag, Ingredient, Subscription, RecipeIngredient
 from .constants import SHORT_LINK_PREFIX, DOMAIN
 from .filters import RecipeFilter
 from .serializers import (
-    AdvancedUserSerializer, RecipeSerializer, RecipeCreateSerializer,
+    RecipeSerializer, RecipeCreateSerializer,
     TagSerializer, IngredientSerializer, ShortRecipeSerializer,
     SubscriptionUserSerializer, AvatarSerializer
 )
