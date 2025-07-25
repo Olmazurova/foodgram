@@ -5,9 +5,8 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 from rest_framework import serializers
 
-from recipes.models import (
-    Subscription, Recipe, Ingredient, RecipeIngredient, Tag
-)
+from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
+                            Tag)
 from .constants import PAGE_SIZE
 
 User = get_user_model()
