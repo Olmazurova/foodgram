@@ -1,4 +1,4 @@
-SHORT_LINK_PREFIX = 'http://127.0.0.1:8000/s/'
+SHORT_LINK_PREFIX = 'www.olmazurova.ru/s/'
 PREFIX = 's'
-DOMAIN = 'http://127.0.0.1:8000/'
+DOMAIN = 'www.olmazurova.ru/'
 PAGE_SIZE = 10

@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404
 from recipes.models import Recipe
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from .serializers import ShortRecipeSerializer
 
 
 def get_recipes_in_cart(user):
     return Recipe.objects.filter(is_in_shopping_cart=user)
+
 
 def get_recipes_in_favorited(user):
     return Recipe.objects.filter(is_favorited=user)
@@ -33,7 +36,9 @@ def _handler_favorite_or_cart(self, request, pk=None, cart=False):
         serializer = ShortRecipeSerializer(data=recipe,
                                            context={'request': request})
         serializer.is_valid()
-        return Response(serializer.validated_data, status=status.HTTP_201_CREATED)
+        return Response(
+            serializer.validated_data, status=status.HTTP_201_CREATED
+        )
 
     if recipe not in recipes_in_name_field:
         raise ValidationError(

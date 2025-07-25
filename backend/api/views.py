@@ -8,7 +8,6 @@ from rest_framework import status, viewsets, generics, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS, IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 
 from recipes.models import (Recipe, Tag, Ingredient,
@@ -120,7 +119,7 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
         return self._handler_recipe(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-        response = super().partial_update(request, *args, **kwargs)
+        super().partial_update(request, *args, **kwargs)
         return self._handler_recipe(request, update=True, *args, **kwargs)
 
     def _handler_recipe(self, request, update=False, *args, **kwargs):
@@ -130,7 +129,9 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         recipe = serializer.save()
-        read_serializer = RecipeSerializer(recipe, context={'request': request})
+        read_serializer = RecipeSerializer(
+            recipe, context={'request': request}
+        )
         response_status = (status.HTTP_200_OK if update
                            else status.HTTP_201_CREATED)
         return Response(read_serializer.data, status=response_status)
@@ -143,7 +144,9 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
         """Добавляет и удаляет рецепт из избранного."""
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        serializer = ShortRecipeSerializer(recipe, context={'request': request})
+        serializer = ShortRecipeSerializer(
+            recipe, context={'request': request}
+        )
 
         if request.method == 'POST':
             recipes_in_favorited = Recipe.objects.filter(is_favorited=user)
@@ -174,7 +177,9 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
         """Добавляет и удаляет рецепт из избранного."""
         user = request.user
         recipe = get_object_or_404(Recipe, id=pk)
-        serializer = ShortRecipeSerializer(recipe, context={'request': request})
+        serializer = ShortRecipeSerializer(
+            recipe, context={'request': request}
+        )
         recipes_in_shopping_cart = Recipe.objects.filter(
             is_in_shopping_cart=user
         )

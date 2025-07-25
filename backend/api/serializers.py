@@ -125,7 +125,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     """Сериализатор рецептов."""
 
-    id =  serializers.IntegerField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     author = AdvancedUserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(
@@ -143,7 +143,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name', 'image', 'text', 'cooking_time',
         )
 
-    def get_is_favorited(self, obj):  # создать отдельную функцию для этих методов
+    def get_is_favorited(self, obj):  # создать функцию для этих методов
         user = self.context.get('request').user
         return (user.is_authenticated
                 and obj.is_favorited.filter(id=user.id).exists())

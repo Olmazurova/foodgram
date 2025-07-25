@@ -8,6 +8,7 @@ class GetUserMixin:
     def get_user(self):
         return self.request.user
 
+
 class AuthenticatedPermissionMixin(GetUserMixin, APIView):
     """Добавляет класс разрешений IsAuthenticated."""
 
