@@ -140,3 +140,8 @@ DJOSER = {
         'user': ['api.permissions.UsersPermissions'],
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://olmazurova.ru",
+    "https://www.olmazurova.ru",
+]
