@@ -26,7 +26,7 @@ services:
       - .env
     image: olmazurova/foodgram_frontend
     command:
-      - cp -r result_build/. /static/
+      - cp -r /app/build/. /static/
     volumes:
       - static:/static
 
