@@ -12,6 +12,7 @@ from rest_framework.response import Response
 
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
                             Tag)
+
 from .constants import DOMAIN, SHORT_LINK_PREFIX
 from .filters import RecipeFilter
 from .mixins import (AllowAnyPermissionsMixin, AuthenticatedPermissionMixin,
@@ -61,8 +62,8 @@ class SubscribeView(AuthenticatedPermissionMixin):
         follower = self.get_queryset()
         if (user == follower
             or Subscription.objects.filter(
-                    user=user, following=follower
-                ).exists()):
+                user=user, following=follower
+            ).exists()):
             raise ValidationError('Ошибка подписки')
         Subscription.objects.create(user=user, following=follower)
         serializer = SubscriptionUserSerializer(

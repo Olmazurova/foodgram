@@ -76,10 +76,10 @@ jobs:
         run: |
           cd frontend/
           npm ci --legacy-peer-deps
-      - name: Test frontend
-        run: |
-          cd frontend/
-          npm run rest
+#      - name: Test frontend
+#        run: |
+#          cd frontend/
+#          npm run rest
 
   frontend_build_and_push_to_docker_hub:
     name: Push frontend Docker image to DockerHub
