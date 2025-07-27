@@ -3,9 +3,8 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
-from api.serializers import ShortRecipeSerializer
+from .serializers import ShortRecipeSerializer
 from recipes.models import Recipe
-
 
 
 def get_recipes_in_cart(user):
