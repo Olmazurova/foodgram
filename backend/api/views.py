@@ -97,7 +97,7 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
     """Предстваление отображения рецепта."""
 
     http_method_names = ['get', 'post', 'patch', 'delete']
-    queryset = Recipe.objects.all().order_by('name')
+    queryset = Recipe.objects.all().order_by('-created')
     lookup_field = 'pk'
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
