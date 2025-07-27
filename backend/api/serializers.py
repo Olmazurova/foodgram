@@ -142,7 +142,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             'name', 'image', 'text', 'cooking_time',
         )
 
-    def get_is_favorited(self, obj):  # создать функцию для этих методов
+    def get_is_favorited(self, obj):
         user = self.context.get('request').user
         return (user.is_authenticated
                 and obj.is_favorited.filter(id=user.id).exists())
@@ -257,7 +257,6 @@ class ShortRecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
     def validate(self, attrs):
-        print(attrs)
         user = self.context.get('request').user
         recipes_in_cart = Recipe.objects.filter(is_in_shopping_cart=user)
         recipes_in_favorited = Recipe.objects.filter(is_favorited=user)

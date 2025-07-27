@@ -10,9 +10,6 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
-                            Tag)
-
 from .constants import DOMAIN, SHORT_LINK_PREFIX
 from .filters import RecipeFilter
 from .mixins import (AllowAnyPermissionsMixin, AuthenticatedPermissionMixin,
@@ -23,6 +20,8 @@ from .serializers import (AvatarSerializer, IngredientSerializer,
                           ShortRecipeSerializer, SubscriptionUserSerializer,
                           TagSerializer)
 from .utils import get_recipes_in_cart
+from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
+                            Tag)
 
 User = get_user_model()
 
@@ -63,7 +62,8 @@ class SubscribeView(AuthenticatedPermissionMixin):
         if (user == follower
             or Subscription.objects.filter(
                 user=user, following=follower
-            ).exists()):
+            ).exists()
+        ):
             raise ValidationError('Ошибка подписки')
         Subscription.objects.create(user=user, following=follower)
         serializer = SubscriptionUserSerializer(
