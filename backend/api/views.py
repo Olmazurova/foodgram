@@ -220,7 +220,7 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
             'ingredient__name', 'ingredient__measurement_unit'
         ).annotate(total_amount=Sum('amount'))
         file_name = f'shopping_cart_{user.username}.txt'
-        content = ['Ваш список покупок:',]
+        content = ['Ваш список покупок:', ]
 
         for ingredient in ingredients_summary:
             name = ingredient['ingredient__name']
