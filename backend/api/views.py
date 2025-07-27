@@ -59,11 +59,9 @@ class SubscribeView(AuthenticatedPermissionMixin):
     def post(self, request, *args, **kwargs):
         user = self.get_user()
         follower = self.get_queryset()
-        if (user == follower
-            or Subscription.objects.filter(
+        if user == follower or Subscription.objects.filter(
                 user=user, following=follower
-            ).exists()
-        ):
+        ).exists():
             raise ValidationError('Ошибка подписки')
         Subscription.objects.create(user=user, following=follower)
         serializer = SubscriptionUserSerializer(
