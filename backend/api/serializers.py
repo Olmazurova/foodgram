@@ -1,36 +1,12 @@
-import base64
-
 from django.contrib.auth import get_user_model
-from django.core.files.base import ContentFile
-from django.utils import timezone
 from rest_framework import serializers
 
 from api.constants import PAGE_SIZE
+from api.fields import Base64ImageField
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
                             Tag)
 
 User = get_user_model()
-
-
-class Base64ImageField(serializers.ImageField):
-
-    def to_internal_value(self, data):
-        user = self.context['request'].user
-        if self.context['request'].method == 'PUT':
-            name = f'{user}.'
-        elif self.context['request'].method == 'POST':
-            name = f'{user}-{timezone.now()}.'
-        else:
-            id = self.context['request'].path.split('/')[-2]
-            recipe = Recipe.objects.get(id=int(id))
-            name = f'{user}-{recipe}.'
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            file_extension = format.split('/')[-1]
-            data = ContentFile(
-                base64.b64decode(imgstr), name=name + file_extension
-            )
-        return super().to_internal_value(data)
 
 
 class AvatarSerializer(serializers.Serializer):
