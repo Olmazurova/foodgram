@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from api.constants import PAGE_SIZE
 from api.fields import Base64ImageField
+from api.utils import bulk_create_ingredients_and_tags
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
                             Tag)
 
@@ -133,17 +134,17 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания и обновления рецепта."""
 
     ingredients = RecipeIngredientSerializer(
-        many=True, source='recipeingredient_set'
+        many=True, source='recipeingredient_set', required=True
     )
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(), many=True
+        queryset=Tag.objects.all(), many=True, required=True
     )
     image = Base64ImageField()  # в patch запросе необязателен
 
     class Meta:
         model = Recipe
         fields = (
-            'ingredients', 'tags', 'image',
+            'id', 'ingredients', 'tags', 'image',
             'name', 'text', 'cooking_time',
         )
 
@@ -152,37 +153,18 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         tags = validated_data.pop('tags')
         user = self.context.get('request').user
         recipe = Recipe.objects.create(author=user, **validated_data)
-        recipe.tags.set(tags)
-        for ingredient in ingredients_data:
-            current_ingredient = ingredient['ingredient']
-            amount = ingredient['amount']
-            RecipeIngredient.objects.create(
-                ingredient=current_ingredient,
-                recipe=recipe,
-                amount=amount
-            )
+        bulk_create_ingredients_and_tags(
+            recipe=recipe, ingredients_data=ingredients_data, tags=tags
+        )
         return recipe
 
     def update(self, instance, validated_data):
         tags = validated_data.pop('tags', [])
         ingredients_data = validated_data.pop('recipeingredient_set', [])
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        instance.tags.set(tags)
-        RecipeIngredient.objects.filter(recipe=instance).delete()
-        for ingredient in ingredients_data:
-            current_ingredient = Ingredient.objects.get(
-                id=ingredient['ingredient'].id
-            )
-            amount = ingredient['amount']
-            RecipeIngredient.objects.create(
-                ingredient=current_ingredient,
-                recipe=instance,
-                amount=amount
-            )
+        bulk_create_ingredients_and_tags(
+            recipe=instance, ingredients_data=ingredients_data, tags=tags
+        )
+        instance = super().update(instance, validated_data)
         return instance
 
     def validate_image(self, value):
@@ -212,6 +194,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         request = self.context.get('request')
         if request and request.method == 'PATCH':
+            attrs['image'] = attrs.get('image', self.instance.image)
             missing_fields = []
             for field in ['recipeingredient_set', 'tags', 'name', 'text',
                           'cooking_time']:
