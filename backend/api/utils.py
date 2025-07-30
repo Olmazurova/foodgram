@@ -1,12 +1,15 @@
-from recipes.models import Recipe, RecipeIngredient
+from recipes.models import Recipe, RecipeIngredient, Subscription
 
 
-def get_recipes_in_cart(user):
-    return Recipe.objects.filter(is_in_shopping_cart=user)
+def get_recipes_filter_by_field_name(field_name, value):
+    filter_kwargs = {field_name: value}
+    return Recipe.objects.filter(**filter_kwargs)
 
 
-def get_recipes_in_favorited(user):
-    return Recipe.objects.filter(is_favorited=user)
+def available_subscription(user, following):
+    return Subscription.objects.filter(
+        user=user, following=following
+    ).exists()
 
 
 def bulk_create_ingredients_and_tags(recipe, ingredients_data, tags):

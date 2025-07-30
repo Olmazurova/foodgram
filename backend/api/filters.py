@@ -23,7 +23,7 @@ class RecipeFilter(FilterSet):
             'author', 'tags__slug', 'is_favorited', 'is_in_shopping_cart'
         )
 
-    def _filter_user_relation(self, queryset,field_name, value):
+    def _filter_user_relation(self, queryset, field_name, value):
         user = self.request.user
         if not user.is_authenticated:
             return queryset.none()
