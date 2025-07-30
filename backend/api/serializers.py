@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from api.constants import PAGE_SIZE
 from api.fields import Base64ImageField
-from api.utils import bulk_create_ingredients_and_tags
+from api.utils import available_subscription, bulk_create_ingredients_and_tags
 from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
                             Tag)
 
@@ -35,9 +35,7 @@ class AdvancedUserSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
         if user.is_authenticated:
-            return Subscription.objects.filter(
-                user=user, following=obj
-            ).exists()
+            return available_subscription(user, obj)
         return False
 
 
@@ -134,12 +132,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания и обновления рецепта."""
 
     ingredients = RecipeIngredientSerializer(
-        many=True, source='recipeingredient_set', required=True
+        many=True, source='recipeingredient_set', required=True,
     )
     tags = serializers.PrimaryKeyRelatedField(
-        queryset=Tag.objects.all(), many=True, required=True
+        queryset=Tag.objects.all(), many=True, required=True,
     )
-    image = Base64ImageField()  # в patch запросе необязателен
+    image = Base64ImageField(required=True)  # в patch запросе необязателен
 
     class Meta:
         model = Recipe
@@ -194,12 +192,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         request = self.context.get('request')
         if request and request.method == 'PATCH':
-            attrs['image'] = attrs.get('image', self.instance.image)
-            missing_fields = []
-            for field in ['recipeingredient_set', 'tags', 'name', 'text',
-                          'cooking_time']:
-                if field not in attrs:
-                    missing_fields.append(field)
+            missing_fields = [
+                field for field in ['recipeingredient_set', 'tags']
+                if field not in attrs
+            ]
             if missing_fields:
                 raise serializers.ValidationError(
                     {field: 'Обязательное поле.' for field in
