@@ -4,8 +4,7 @@ from rest_framework import serializers
 from api.constants import PAGE_SIZE
 from api.fields import Base64ImageField
 from api.utils import available_subscription, bulk_create_ingredients_and_tags
-from recipes.models import (Ingredient, Recipe, RecipeIngredient, Subscription,
-                            Tag)
+from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
 
 User = get_user_model()
 
@@ -164,6 +163,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
         instance = super().update(instance, validated_data)
         return instance
+
+    def to_representation(self, instance):
+        return RecipeSerializer(instance, context=self.context).data
 
     def validate_image(self, value):
         request = self.context.get('request')

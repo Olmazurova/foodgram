@@ -115,27 +115,6 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
             return [IsAuthenticated()]
         return [IsAuthorOrAdminOrReadOnly()]
 
-    def create(self, request, *args, **kwargs):
-        return self._handler_recipe(request, *args, **kwargs)
-
-    def partial_update(self, request, *args, **kwargs):
-        super().partial_update(request, *args, **kwargs)
-        return self._handler_recipe(request, update=True, *args, **kwargs)
-
-    def _handler_recipe(self, request, update=False, *args, **kwargs):
-        instance = self.get_object() if update else None
-        serializer = self.get_serializer(
-            instance, data=request.data, partial=update
-        )
-        serializer.is_valid(raise_exception=True)
-        recipe = serializer.save()
-        read_serializer = RecipeSerializer(
-            recipe, context={'request': request}
-        )
-        response_status = (status.HTTP_200_OK if update
-                           else status.HTTP_201_CREATED)
-        return Response(read_serializer.data, status=response_status)
-
     def _handler_favorite_or_shopping_cart(
             self, request, field_name='is_favorited', pk=None
     ):
