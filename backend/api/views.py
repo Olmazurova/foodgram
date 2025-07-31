@@ -213,9 +213,7 @@ class DecodeLinkView(AllowAnyPermissionsMixin):
 
     def get(self, request, hex_id=None):
         recipe_id = int(hex_id, base=BASE_INT)
-        print('id', recipe_id)
         recipe_url = reverse('recipe-detail', kwargs={'pk': recipe_id})
-        print('url', recipe_url)
         return redirect(recipe_url)
 
 
