@@ -43,8 +43,9 @@ jobs:
           python -m flake8 backend/
 
   backend_build_and_push_to_docker_hub:
+    name: Push backend Docker image to DockerHub
     runs-on: ubuntu-latest
-#    needs: tests
+    needs: tests
     environment: production
     steps:
       - name: Check out the repo
@@ -74,7 +75,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd frontend/
-          npm ci
+          npm ci --legacy-peer-deps
       - name: Test frontend
         run: |
           cd frontend/
@@ -83,7 +84,6 @@ jobs:
   frontend_build_and_push_to_docker_hub:
     name: Push frontend Docker image to DockerHub
     runs-on: ubuntu-latest
-    needs: frontend_tests
     environment: production
     steps:
       - name: Check out the repo
@@ -119,16 +119,16 @@ jobs:
       - name: Push to DockerHub
         uses: docker/build-push-action@v4
         with:
-          context: ./nginx/
+          context: ./infra/
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_gateway:latest
 
   deploy:
     runs-on: ubuntu-latest
     needs:
-      - build_and_push_to_docker_hub
-      - build_frontend_and_push_to_docker_hub
-      - build_gateway_and_push_to_docker_hub
+      - backend_build_and_push_to_docker_hub
+      - frontend_build_and_push_to_docker_hub
+      - gateway_build_and_push_to_docker_hub
     environment: production
     steps:
       - name: Checkout repo

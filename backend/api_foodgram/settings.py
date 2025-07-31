@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from environs import env
@@ -66,12 +67,14 @@ WSGI_APPLICATION = 'api_foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env.str('POSTGRES_DB', 'django'),
-        'USER': env.str('POSTGRES_USER', 'django'),
-        'PASSWORD': env.str('POSTGRES_PASSWORD', ''),
-        'HOST': env.str('DB_HOST', ''),
-        'PORT': env.int('DB_PORT', 5432),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'NAME': env.str('POSTGRES_DB', 'django'),
+        # 'USER': env.str('POSTGRES_USER', 'django'),
+        # 'PASSWORD': env.str('POSTGRES_PASSWORD', ''),
+        # 'HOST': env.str('DB_HOST', ''),
+        # 'PORT': env.int('DB_PORT', 5432),
     }
 }
 
@@ -119,7 +122,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
-         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ],
 
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.CustomPagination',
@@ -137,6 +140,11 @@ DJOSER = {
     },
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['api.permissions.UsersPermissions'],
+        'user': ['api.permissions.IsAuthorOrAdminOrReadOnly'],
     },
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://olmazurova.ru",
+    "https://www.olmazurova.ru",
+]
