@@ -129,7 +129,7 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
         field = getattr(recipe, field_name)
 
         if request.method == 'POST':
-            if recipe in filtered_recipes:
+            if filtered_recipes.filter(id=recipe.id).exists():
                 return Response(
                     {'errors': add_error_msg},
                     status=status.HTTP_400_BAD_REQUEST
