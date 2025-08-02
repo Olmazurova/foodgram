@@ -137,7 +137,7 @@ class RecipeViewSet(GetUserMixin, viewsets.ModelViewSet):
             field.add(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if recipe not in filtered_recipes:
+        if not filtered_recipes.filter(id=recipe.id).exists():
             return Response(
                 {'errors': del_error_msg}, status=status.HTTP_400_BAD_REQUEST
             )
